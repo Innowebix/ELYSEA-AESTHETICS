@@ -1,0 +1,41 @@
+"use client";
+
+import { useRef } from "react";
+
+import SmoothScroll from "@/components/layout/SmoothScroll";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+
+import Hero from "@/components/sections/Hero";
+import Marquee from "@/components/sections/Marquee";
+import Philosophy from "@/components/sections/Philosophy";
+import Treatments from "@/components/sections/Treatments";
+import Statement from "@/components/sections/Statement";
+import Approach from "@/components/sections/Approach";
+import Contact from "@/components/sections/Contact";
+
+import { useHomeAnimations } from "@/hooks/useHomeAnimations";
+
+export default function ElyseaHomepage() {
+  const mainRef = useRef<HTMLElement>(null);
+
+  useHomeAnimations(mainRef);
+
+  return (
+    <>
+      <SmoothScroll />
+      <Header />
+
+      <main ref={mainRef}>
+        <Hero />
+        <Marquee />
+        <Philosophy />
+        <Treatments />
+        <Statement />
+        <Approach />
+        <Contact />
+        <Footer />
+      </main>
+    </>
+  );
+}

@@ -1,0 +1,710 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ArrowDown, ArrowRight, ArrowUpRight, Menu, X, Sparkles } from "lucide-react";
+import Lenis from "lenis";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+type Treatment = {
+  name: string;
+  note: string;
+  image: string;
+  alt: string;
+};
+
+const treatments: Treatment[] = [
+  {
+    name: "Skin treatments",
+    note: "Thoughtful care, tailored to what your skin needs today.",
+    image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&w=1100&q=85",
+    alt: "A calm skincare treatment in a softly lit studio"
+  },
+  {
+    name: "Laser treatments",
+    note: "Technology-led options, considered around your skin goals.",
+    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1100&q=85",
+    alt: "A close-up of a professional facial treatment"
+  },
+  {
+    name: "Anti-ageing treatments",
+    note: "A considered approach to looking refreshed and feeling like you.",
+    image: "https://images.unsplash.com/photo-1552693673-1bf958298935?auto=format&fit=crop&w=1100&q=85",
+    alt: "Natural skin and beauty editorial portrait"
+  },
+  {
+    name: "Facials & skin rejuvenation",
+    note: "Restorative rituals designed around comfort and skin vitality.",
+    image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=1100&q=85",
+    alt: "Skincare products arranged in a minimalist setting"
+  },
+  {
+    name: "Acne & acne scar care",
+    note: "A patient, personalised path towards healthier-looking skin.",
+    image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1100&q=85",
+    alt: "Minimal skincare product and botanical detail"
+  },
+  {
+    name: "Chemical peels",
+    note: "Professionally guided exfoliation, selected for your skin.",
+    image: "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&w=1100&q=85",
+    alt: "Serene skincare consultation setting"
+  },
+  {
+    name: "Pigmentation treatments",
+    note: "Personalised options for a more even-looking complexion.",
+    image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=1100&q=85",
+    alt: "Skincare treatment detail"
+  },
+  {
+    name: "Hair treatments",
+    note: "Scalp and hair care, approached with the same attention to detail.",
+    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1100&q=85",
+    alt: "Healthy hair in soft natural light"
+  },
+  {
+    name: "Body contouring",
+    note: "A considered conversation about your personal body goals.",
+    image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1100&q=85",
+    alt: "Minimal wellness and body-care editorial image"
+  }
+];
+
+const navItems = [
+  { label: "Our philosophy", href: "#philosophy" },
+  { label: "Treatments", href: "#treatments" },
+  { label: "The Elysea approach", href: "#approach" },
+  { label: "Contact", href: "#contact" }
+];
+
+function SmoothScroll() {
+  const prefersReducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+
+    const lenis = new Lenis({
+      autoRaf: false,
+      duration: 1.15,
+      smoothWheel: true,
+      anchors: true,
+      syncTouch: false
+    });
+
+    lenis.on("scroll", ScrollTrigger.update);
+    const tick = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tick);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      gsap.ticker.remove(tick);
+      lenis.destroy();
+    };
+  }, [prefersReducedMotion]);
+
+  return null;
+}
+
+function MenuOverlay({ open, close }: { open: boolean; close: () => void }) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="menu-overlay"
+          initial={{ clipPath: "inset(0 0 100% 0 round 0 0 44% 44%)" }}
+          animate={{ clipPath: "inset(0 0 0% 0 round 0 0 0% 0)" }}
+          exit={{ clipPath: "inset(0 0 100% 0 round 0 0 44% 44%)" }}
+          transition={{ duration: 0.72, ease: [0.76, 0, 0.24, 1] }}
+          aria-modal="true"
+          role="dialog"
+          aria-label="Main navigation"
+        >
+          <div className="menu-overlay-top">
+            <Link href="#top" className="wordmark wordmark-dark" onClick={close}>
+              <span>ELYSEA</span><small>AESTHETICS</small>
+            </Link>
+            <button className="icon-button icon-button-dark" onClick={close} aria-label="Close menu">
+              <X size={21} strokeWidth={1.4} />
+            </button>
+          </div>
+          <nav className="menu-overlay-links" aria-label="Mobile navigation">
+            {navItems.map((item, index) => (
+              <motion.div
+                key={item.href}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.16 + index * 0.08, duration: 0.55 }}
+              >
+                <Link href={item.href} onClick={close}>
+                  <span className="menu-index">0{index + 1}</span>
+                  <span>{item.label}</span>
+                  <ArrowUpRight size={20} strokeWidth={1.25} />
+                </Link>
+              </motion.div>
+            ))}
+          </nav>
+          <div className="menu-overlay-bottom">
+            <span>SKIN · SCIENCE · SELF</span>
+            <span>BY APPOINTMENT</span>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 32);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <>
+      <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
+        <Link href="#top" className="wordmark" aria-label="Elysea Aesthetics home">
+          <span>ELYSEA</span>
+          <small>AESTHETICS</small>
+        </Link>
+        <nav className="desktop-nav" aria-label="Main navigation">
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href}>{item.label}</Link>
+          ))}
+        </nav>
+        <div className="header-actions">
+          <Link href="#contact" className="header-book">Book a consultation <ArrowUpRight size={14} /></Link>
+          <button className="icon-button menu-trigger" onClick={() => setMenuOpen(true)} aria-label="Open menu">
+            <Menu size={22} strokeWidth={1.35} />
+          </button>
+        </div>
+      </header>
+      <MenuOverlay open={menuOpen} close={() => setMenuOpen(false)} />
+    </>
+  );
+}
+
+
+function Hero() {
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <section className="hero-section hero-v2-section" id="top">
+      <div className="hero-v2-background" aria-hidden="true" />
+      <div className="hero-v2-grain" aria-hidden="true" />
+
+      <Header />
+
+      <div className="hero-v2-grid page-gutter">
+
+        {/* LEFT: EDITORIAL CONTENT */}
+        <div className="hero-v2-copy">
+
+          <motion.div
+            className="hero-v2-kicker"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <span className="hero-v2-kicker-icon">
+              <Sparkles size={17} strokeWidth={1.4} />
+            </span>
+
+            <span>ADVANCED AESTHETICS</span>
+
+            <span className="hero-v2-kicker-divider" />
+
+            <span>PERSONAL BY NATURE</span>
+          </motion.div>
+
+          <motion.h1
+            className="hero-v2-title"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 55 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 1.1,
+              delay: 0.3,
+              ease: [0.22, 1, 0.36, 1]
+            }}
+          >
+            <span>The beauty of</span>
+            <span>
+              being <em>you.</em>
+            </span>
+          </motion.h1>
+
+          <motion.div
+            className="hero-v2-divider"
+            initial={prefersReducedMotion ? false : { width: 0 }}
+            animate={{ width: "100%" }}
+            transition={{ duration: 0.9, delay: 0.65 }}
+          >
+            <span />
+          </motion.div>
+
+          <motion.p
+            className="hero-v2-description"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.65 }}
+          >
+            Thoughtful skin and aesthetic care, guided by your
+            goals and tailored to you. A welcoming space for
+            every skin, every story and every expression of self.
+          </motion.p>
+
+          {/* CALL TO ACTION */}
+          <motion.div
+            className="hero-v2-actions"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.85 }}
+          >
+            <Link
+              href="#treatments"
+              className="hero-v2-primary"
+            >
+              <span>Explore our treatments</span>
+
+              <span className="hero-v2-cta-icon">
+                <ArrowUpRight size={19} strokeWidth={1.6} />
+              </span>
+            </Link>
+
+            <Link
+              href="#contact"
+              className="hero-v2-secondary"
+            >
+              <span>Begin your journey</span>
+              <ArrowUpRight size={16} />
+            </Link>
+          </motion.div>
+
+          {/* BRAND DETAILS */}
+          <motion.div
+            className="hero-v2-details"
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1 }}
+          >
+            <div className="hero-v2-detail">
+              <span className="hero-v2-detail-number">01</span>
+              <span>SKIN · LASER · REJUVENATION</span>
+            </div>
+
+            <div className="hero-v2-detail">
+              <span className="hero-v2-detail-dot" />
+              <span>CARE FOR EVERY SKIN</span>
+            </div>
+          </motion.div>
+
+        </div>
+
+        {/* RIGHT: ART DIRECTION / PHOTOGRAPHY */}
+        <motion.div
+          className="hero-v2-visual"
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 45 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 1.2,
+            delay: 0.25,
+            ease: [0.22, 1, 0.36, 1]
+          }}
+        >
+
+          {/* Organic background shapes */}
+          <div
+            className="hero-v2-halo"
+            aria-hidden="true"
+          />
+
+          <div
+            className="hero-v2-orbit"
+            aria-hidden="true"
+          />
+
+          {/* Main portrait */}
+          <motion.div
+            className="hero-v2-image-frame"
+            initial={
+              prefersReducedMotion
+                ? false
+                : {
+                    clipPath: "inset(16% 0 0 0 round 50% 50% 4px 4px)",
+                    scale: 1.04
+                  }
+            }
+            animate={{
+              clipPath: "inset(0% 0 0 0 round 50% 50% 4px 4px)",
+              scale: 1
+            }}
+            transition={{
+              duration: 1.6,
+              delay: 0.3,
+              ease: [0.76, 0, 0.24, 1]
+            }}
+          >
+            <Image
+              src="/images/elysea-hero.png"
+              alt="Editorial portrait celebrating natural skin and beauty"
+              fill
+              priority
+              sizes="(max-width: 900px) 100vw, 48vw"
+              className="hero-v2-image"
+            />
+
+            <div className="hero-v2-image-overlay" />
+
+            <div className="hero-v2-image-caption">
+              <span>THE ELYSEA EXPERIENCE</span>
+              <strong>Care, with intention.</strong>
+            </div>
+          </motion.div>
+
+          {/* Floating brand seal */}
+          <motion.div
+            className="hero-v2-seal"
+            initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              duration: 0.9,
+              delay: 1.1,
+              ease: [0.22, 1, 0.36, 1]
+            }}
+          >
+            <span className="hero-v2-seal-brand">ELYSEA</span>
+
+            <Sparkles size={23} strokeWidth={1.1} />
+
+            <span className="hero-v2-seal-caption">
+              SKIN · SCIENCE · SELF
+            </span>
+          </motion.div>
+
+          {/* Vertical editorial text */}
+          <div className="hero-v2-side-text">
+            PERSONAL BEAUTY, REIMAGINED
+          </div>
+
+          <div className="hero-v2-image-index">
+            01 / THE ART OF FEELING LIKE YOU
+          </div>
+
+        </motion.div>
+      </div>
+
+      {/* SCROLL INDICATOR */}
+      <Link
+        href="#philosophy"
+        className="hero-v2-scroll"
+        aria-label="Scroll to discover"
+      >
+        <span>SCROLL TO DISCOVER</span>
+        <span className="hero-v2-scroll-line" />
+        <ArrowDown size={17} strokeWidth={1.3} />
+      </Link>
+
+      <div className="hero-v2-bottom-note">
+        ELYSEA AESTHETICS — AN APPROACH TO YOU
+      </div>
+
+    </section>
+  );
+}
+
+
+function Marquee() {
+  const words = ["SKIN HEALTH", "SUBTLE BEAUTY", "PERSONALISED CARE", "CONFIDENTLY YOU"];
+  return (
+    <div className="marquee-band" aria-label="Skin health, subtle beauty, personalised care, confidently you">
+      <div className="marquee-track">
+        {[0, 1].map((copy) => (
+          <div className="marquee-content" key={copy} aria-hidden={copy === 1}>
+            {words.map((word, index) => (
+              <span key={`${word}-${index}`}>{word}<i>✳</i></span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Philosophy() {
+  return (
+    <section className="philosophy-section section-pad" id="philosophy">
+      <div className="section-meta reveal"><span>01 / THE ELYSEA PHILOSOPHY</span><span>BEAUTY, ON YOUR TERMS</span></div>
+      <div className="philosophy-grid">
+        <div className="philosophy-visual image-reveal">
+          <div className="philosophy-image-shell image-parallax">
+            <Image
+              src="https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1200&q=85"
+              alt="Carefully arranged skincare essentials in a warm, minimal setting"
+              fill
+              sizes="(max-width: 800px) 90vw, 42vw"
+            />
+          </div>
+          <div className="image-note">A RITUAL, NOT A ROUTINE <span>✳</span></div>
+        </div>
+        <div className="philosophy-copy">
+          <p className="eyebrow reveal"><span className="eyebrow-dot" /> A DIFFERENT KIND OF CLINIC</p>
+          <h2 className="editorial-heading reveal">Care that sees <em>more</em> than skin.</h2>
+          <p className="body-large reveal">We believe aesthetic care should feel personal, considered and entirely your own.</p>
+          <p className="body-copy reveal">At Elysea, every journey begins with listening. Your skin, your goals and your comfort guide the conversation — so the options you explore feel right for you, not simply the latest trend.</p>
+          <Link href="#approach" className="underlined-link reveal">Discover our approach <ArrowUpRight size={15} /></Link>
+          <div className="philosophy-signature reveal">A little more intention. A lot more you.</div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Treatments() {
+  const [active, setActive] = useState(0);
+  const current = treatments[active];
+
+  return (
+    <section className="treatments-section section-pad" id="treatments">
+      <div className="section-meta reveal"><span>02 / THE TREATMENT EDIT</span><span>EXPLORE WHAT FEELS RIGHT</span></div>
+      <div className="treatments-intro">
+        <div>
+          <p className="eyebrow reveal"><span className="eyebrow-dot" /> YOUR SKIN, YOUR STARTING POINT</p>
+          <h2 className="editorial-heading reveal">Considered care.<br /><em>Personal</em> possibilities.</h2>
+        </div>
+        <p className="treatments-intro-copy reveal">Every skin story is different. Explore our areas of care, then let’s find a thoughtful place to begin.</p>
+      </div>
+
+      <div className="treatment-explorer">
+        <div className="treatment-list" role="list" aria-label="Treatment categories">
+          {treatments.map((treatment, index) => (
+            <button
+              className={`treatment-row ${active === index ? "is-active" : ""}`}
+              key={treatment.name}
+              onMouseEnter={() => setActive(index)}
+              onFocus={() => setActive(index)}
+              onClick={() => setActive(index)}
+              aria-pressed={active === index}
+            >
+              <span className="treatment-number">0{index + 1}</span>
+              <span className="treatment-name-wrap">
+                <span className="treatment-name">{treatment.name}</span>
+                <span className="treatment-note">{treatment.note}</span>
+              </span>
+              <span className="treatment-arrow"><ArrowUpRight size={19} strokeWidth={1.2} /></span>
+            </button>
+          ))}
+        </div>
+        <div className="treatment-preview" aria-live="polite">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current.image}
+              className="treatment-preview-image"
+              initial={{ opacity: 0, scale: 1.035, clipPath: "inset(4% 4% 4% 4% round 46% 46% 3px 3px)" }}
+              animate={{ opacity: 1, scale: 1, clipPath: "inset(0% 0% 0% 0% round 46% 46% 3px 3px)" }}
+              exit={{ opacity: 0, scale: 0.985 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* Remote images are kept as regular img elements so the art direction can be updated without changing Next image config. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={current.image} alt={current.alt} />
+              <div className="preview-caption"><span>ELYSEA / 0{active + 1}</span><span>{current.name.toUpperCase()}</span></div>
+            </motion.div>
+          </AnimatePresence>
+          <div className="preview-footnote">A PERSONAL PATH, NEVER A TEMPLATE.</div>
+        </div>
+      </div>
+      <div className="treatments-bottom reveal">
+        <span>Not sure where to begin?</span>
+        <Link href="#contact" className="underlined-link">Start with a consultation <ArrowUpRight size={15} /></Link>
+      </div>
+    </section>
+  );
+}
+
+function Statement() {
+  return (
+    <section className="statement-section" id="approach">
+      <div className="statement-ornament" aria-hidden="true">✳</div>
+      <p className="eyebrow reveal">03 / THE ELYSEA APPROACH</p>
+      <h2 className="statement-heading reveal">Not a new you.<br />Just <em>more you.</em></h2>
+      <p className="statement-sub reveal">Good aesthetic care doesn't ask you to become someone else. It begins by understanding what matters to you.</p>
+      <div className="statement-bottom"><span>LISTEN FIRST</span><span>PERSONALISE ALWAYS</span><span>CARE, WITH INTENTION</span></div>
+    </section>
+  );
+}
+
+function Approach() {
+  const points = [
+    { no: "01", title: "A conversation, first", text: "We start by understanding your concerns, preferences and expectations." },
+    { no: "02", title: "Options with clarity", text: "Explore suitable options with clear information about the process and considerations." },
+    { no: "03", title: "Your pace, your choice", text: "Feel informed and comfortable taking the next step — or simply taking your time." }
+  ];
+
+  return (
+    <section className="approach-section section-pad">
+      <div className="section-meta reveal"><span>04 / WHAT TO EXPECT</span><span>THOUGHTFUL AT EVERY STEP</span></div>
+      <div className="approach-grid">
+        <div className="approach-title">
+          <p className="eyebrow reveal"><span className="eyebrow-dot" /> THE EXPERIENCE</p>
+          <h2 className="editorial-heading reveal">The details<br />make the <em>difference.</em></h2>
+          <p className="body-copy reveal">A calm, unhurried experience matters. From your first question to your treatment plan, we want you to feel heard, informed and at ease.</p>
+          <Link href="#contact" className="underlined-link reveal">Let's talk about your goals <ArrowUpRight size={15} /></Link>
+        </div>
+        <div className="approach-points">
+          {points.map((point) => (
+            <div className="approach-point reveal" key={point.no}>
+              <span className="approach-no">{point.no}</span>
+              <div><h3>{point.title}</h3><p>{point.text}</p></div>
+              <Sparkles size={17} strokeWidth={1.1} className="approach-spark" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ConsultationForm() {
+  const [submitted, setSubmitted] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [interest, setInterest] = useState("I am exploring my options");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitted(true);
+  }
+
+  return (
+    <form className="consultation-form" onSubmit={handleSubmit}>
+      <div className="form-row">
+        <label htmlFor="name">Your name</label>
+        <input id="name" name="name" autoComplete="name" placeholder="How should we address you?" value={name} onChange={(e) => setName(e.target.value)} required />
+      </div>
+      <div className="form-row">
+        <label htmlFor="email">Email address</label>
+        <input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      </div>
+      <div className="form-row">
+        <label htmlFor="interest">I'm interested in</label>
+        <select id="interest" name="interest" value={interest} onChange={(e) => setInterest(e.target.value)}>
+          <option>I am exploring my options</option>
+          {treatments.map((t) => <option key={t.name}>{t.name}</option>)}
+        </select>
+      </div>
+      <button type="submit" className="form-submit">Send an enquiry <ArrowUpRight size={16} /></button>
+      {submitted && (
+        <p className="form-notice" role="status">
+          Thank you, {name}. The enquiry form is ready for connection to Elysea's booking inbox or CRM before launch; no message has been sent yet.
+        </p>
+      )}
+      <p className="form-privacy">Your details should only be used to respond to your enquiry. Add your clinic's privacy policy before publishing this form.</p>
+    </form>
+  );
+}
+
+function Contact() {
+  return (
+    <section className="contact-section section-pad" id="contact">
+      <div className="section-meta reveal"><span>05 / YOUR NEXT CHAPTER</span><span>WE'D LOVE TO HEAR FROM YOU</span></div>
+      <div className="contact-grid">
+        <div className="contact-copy">
+          <p className="eyebrow reveal"><span className="eyebrow-dot" /> BEGIN WITH A CONVERSATION</p>
+          <h2 className="editorial-heading reveal">Let's make space<br />for <em>you.</em></h2>
+          <p className="body-large reveal">Every good journey starts with a question. Tell us what you have in mind.</p>
+          <div className="contact-details reveal">
+            <div><span>VISIT</span><p>Clinic address to be added</p></div>
+            <div><span>CONNECT</span><p>Clinic phone and email to be added</p></div>
+            <div><span>HOURS</span><p>Appointment hours to be confirmed</p></div>
+          </div>
+        </div>
+        <div className="contact-form-wrap reveal">
+          <div className="form-heading"><span>THE FIRST STEP</span><span>✳</span></div>
+          <ConsultationForm />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="site-footer">
+      <div className="footer-top">
+        <div className="footer-brand">
+          <Link href="#top" className="wordmark wordmark-footer"><span>ELYSEA</span><small>AESTHETICS</small></Link>
+          <p>The art of beautiful skin.<br />The freedom to feel like you.</p>
+        </div>
+        <div className="footer-nav">
+          <div><span className="footer-label">EXPLORE</span><Link href="#philosophy">Our philosophy</Link><Link href="#treatments">Treatments</Link><Link href="#approach">Our approach</Link></div>
+          <div><span className="footer-label">CONNECT</span><Link href="#contact">Book a consultation</Link><Link href="#contact">Contact</Link></div>
+        </div>
+        <Link href="#top" className="back-top">BACK TO THE TOP <ArrowUpRight size={15} /></Link>
+      </div>
+      <div className="footer-bottom"><span>© {new Date().getFullYear()} ELYSEA AESTHETICS</span><span>SKIN · SCIENCE · SELF</span><span>PRIVACY POLICY TO BE ADDED</span></div>
+    </footer>
+  );
+}
+
+export default function ElyseaHomepage() {
+  const mainRef = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+
+    gsap.utils.toArray<HTMLElement>(".reveal").forEach((element) => {
+      gsap.fromTo(element,
+        { y: 34, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: { trigger: element, start: "top 88%", once: true }
+        }
+      );
+    });
+
+    gsap.utils.toArray<HTMLElement>(".image-parallax").forEach((element) => {
+      gsap.fromTo(element,
+        { yPercent: -5 },
+        { yPercent: 5, ease: "none", scrollTrigger: { trigger: element, start: "top bottom", end: "bottom top", scrub: 1.1 } }
+      );
+    });
+
+    gsap.to(".hero-image", {
+      scale: 1.07,
+      ease: "none",
+      scrollTrigger: { trigger: ".hero-section", start: "top top", end: "bottom top", scrub: 1 }
+    });
+
+    ScrollTrigger.refresh();
+  }, { scope: mainRef });
+
+  return (
+    <>
+      <SmoothScroll />
+      <main ref={mainRef}>
+        <Hero />
+        <Marquee />
+        <Philosophy />
+        <Treatments />
+        <Statement />
+        <Approach />
+        <Contact />
+        <Footer />
+      </main>
+    </>
+  );
+}
