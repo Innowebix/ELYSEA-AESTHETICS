@@ -53,3 +53,4 @@ The consultation form currently demonstrates the front-end interaction only. It 
 
 - Metadata currently uses a reserved `.example` domain placeholder. Set the real production URL in `src/app/layout.tsx`.
 - The design intentionally avoids repeated square cards and uses editorial typography, organic image masks, asymmetric sections and open treatment rows.
+# ELYSEA-AESTHETICS
