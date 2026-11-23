@@ -79,7 +79,7 @@ function StylizedMap() {
                     </span>
                 </span>
                 <span className="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-full border border-sand bg-cream/95 px-3 py-1 text-[11px] font-bold text-plum shadow-sm">
-                    ELYSEA · SUITE 4
+                    ELYSEA AESTHETICS
                 </span>
             </div>
         </div>

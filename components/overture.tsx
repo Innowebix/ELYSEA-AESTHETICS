@@ -76,7 +76,7 @@ export default function Overture() {
                                 transition={{ delay: 0.25, duration: 0.8 }}
                                 className="text-[10px] font-bold uppercase tracking-[0.5em] text-gild"
                             >
-                                Est. 2016 · Beverly Grove
+                                Est. 2026 · Bharuch
                             </motion.p>
 
                             <div className="mt-6 flex justify-center overflow-hidden">

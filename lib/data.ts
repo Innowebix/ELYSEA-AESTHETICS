@@ -14,15 +14,15 @@ import {
 
 export const CLINIC = {
 	name: "Elysea Aesthetics",
-	address1: "128 Rosewater Lane, Suite 4",
-	address2: "Beverly Grove, Los Angeles, CA 90048",
-	phone: "+1 (310) 555-0184",
-	phoneHref: "tel:+13105550184",
+	address1: "FF-52, SHARNAM SKY, beside Jhulelal Hospital, Zadeshwar Chowkdi",
+	address2: "Ganesh Shrishti, Zadeshwar, Bharuch, Gujarat 392011",
+	phone: "+91 81411 15873",
+	phoneHref: "tel:+918141115873",
 	email: "hello@elysea.clinic",
 	instagram: "https://www.instagram.com/",
 	facebook: "https://www.facebook.com/",
 	youtube: "https://www.youtube.com/",
-	mapsUrl: "https://www.google.com/maps/search/?api=1&query=Beverly+Grove+Los+Angeles+CA",
+	mapsUrl: "https://maps.app.goo.gl/b64q4EErcJeBsH5z5",
 };
 
 export const NAV_LINKS = [
