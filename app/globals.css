@@ -419,3 +419,23 @@ html.lenis body {
 		scroll-behavior: auto;
 	}
 }
+
+/* =========================================
+   ELYSEA - GOOGLE MAP STYLING
+========================================= */
+
+.clinic-map-frame {
+	filter: grayscale(0.78) sepia(0.14) saturate(0.82) contrast(0.96) brightness(1.03);
+	transition: filter 450ms ease;
+}
+
+.clinic-map-frame:hover,
+.clinic-map-frame:focus-visible {
+	filter: grayscale(0.2) sepia(0.04) saturate(0.95) contrast(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.clinic-map-frame {
+		transition: none;
+	}
+}
