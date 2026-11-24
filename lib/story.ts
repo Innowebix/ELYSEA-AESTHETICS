@@ -2,8 +2,8 @@ export const STORY_LINKS = [
 	{ label: "Story", href: "#story" },
 	{ label: "Treatments", href: "#treatments" },
 	{ label: "The Method", href: "#philosophy" },
-	{ label: "Results", href: "#results" },
-	{ label: "Journal", href: "#journal" },
+	{ label: "Our Clinic", href: "#results" },
+	// { label: "Journal", href: "#journal" },
 	{ label: "Visit", href: "#visit" },
 ];
 

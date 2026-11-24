@@ -32,7 +32,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkle } from "@/components/primitives";
 import { useSmoothScroll } from "@/components/smooth-scroll";
-import { BOOKING_TIMES, CLINIC, TREATMENTS, to12h } from "@/lib/data";
+import { BOOKING_TIMES, CLINIC, TREATMENTS, formatPrice, to12h } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 type BookingContextValue = { openBooking: (treatmentId?: string) => void };
@@ -119,7 +119,7 @@ function BookingDialog({
         ...TREATMENTS.map((t) => ({
             id: t.id,
             name: t.name,
-            meta: `${t.duration} · from $${t.price}`,
+            meta: `${t.duration} · from ${formatPrice(t.price)}`,
         })),
     ];
     const treatmentName =
@@ -304,13 +304,13 @@ function BookingDialog({
                                                         )}
                                                     >
                                                         <span className={cn("block text-[10px] font-bold uppercase tracking-wider", active ? "text-gild" : "text-copper")}>
-                                                            {d.date.toLocaleDateString("en-US", { weekday: "short" })}
+                                                            {d.date.toLocaleDateString("en-IN", { weekday: "short" })}
                                                         </span>
                                                         <span className="block font-display text-xl font-medium">
                                                             {d.date.getDate()}
                                                         </span>
                                                         <span className={cn("block text-[10px]", active ? "text-cream/60" : "text-plum/50")}>
-                                                            {d.date.toLocaleDateString("en-US", { month: "short" })}
+                                                            {d.date.toLocaleDateString("en-IN", { month: "short" })}
                                                         </span>
                                                     </button>
                                                 );
@@ -345,7 +345,7 @@ function BookingDialog({
                                             })}
                                         </div>
                                         <p className="mt-3 text-[11px] text-plum/45">
-                                            Pacific Time · Clinic closed Sundays · Struck-through slots are taken.
+                                            {CLINIC.timezoneLabel} · Clinic closed Sundays · Struck-through slots are taken.
                                         </p>
                                     </div>
                                 )}
@@ -457,7 +457,7 @@ function BookingDialog({
                                             You're booked, <em className="italic text-rose">{firstName}.</em>
                                         </h3>
                                         <p className="mt-2 text-sm text-plum/60">
-                                            Confirmation sent to <span className="font-semibold text-plum">{form.email}</span>
+                                            We&apos;ve saved your request for <span className="font-semibold text-plum">{form.email}</span>
                                         </p>
                                         <span className="mt-3 inline-block rounded-full border border-sand bg-porcelain px-3 py-1 font-mono text-xs font-semibold tracking-wider text-copper">
                                             Ref {reference}
@@ -469,10 +469,10 @@ function BookingDialog({
                                                     icon: CalendarDays,
                                                     label: "Date",
                                                     value: selectedDay
-                                                        ? selectedDay.date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
+                                                        ? selectedDay.date.toLocaleDateString("en-IN", { weekday: "long", month: "long", day: "numeric" })
                                                         : "—",
                                                 },
-                                                { icon: Clock, label: "Time", value: time ? `${to12h(time)} · Pacific` : "—" },
+                                                { icon: Clock, label: "Time", value: time ? `${to12h(time)} · ` : "—" },
                                                 { icon: MapPin, label: "Where", value: CLINIC.address1 },
                                             ].map((row) => (
                                                 <div key={row.label} className="flex items-center gap-3 px-4 py-3">

@@ -235,15 +235,17 @@ export default function Visit() {
                                         {CLINIC.email}
                                     </a>
 
-                                    <a
-                                        href={CLINIC.instagram}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="flex items-center gap-2 font-semibold text-plum transition-colors hover:text-copper"
-                                    >
-                                        <Instagram className="h-4 w-4 text-copper" />
-                                        @elysea.aesthetics
-                                    </a>
+                                    {CLINIC.instagram ? (
+                                        <a
+                                            href={CLINIC.instagram}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="flex items-center gap-2 font-semibold text-plum transition-colors hover:text-copper"
+                                        >
+                                            <Instagram className="h-4 w-4 text-copper" />
+                                            @elysea.aesthetics
+                                        </a>
+                                    ) : null}
 
                                 </div>
 

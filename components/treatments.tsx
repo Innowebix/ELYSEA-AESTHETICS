@@ -1,156 +1,294 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Em, Reveal, SectionHeading } from "@/components/primitives";
-import { useBooking } from "@/components/booking";
-import { FILTERS, TREATMENTS, type Category, type Filter } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  ArrowUpRight,
+  Droplets,
+  Flower2,
+  Leaf,
+  ScanFace,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 
-const ICON_STYLES: Record<Category, string> = {
-    Facials: "from-blush to-petal/70 text-copper",
-    Injectables: "from-rose/15 to-copper/20 text-rose",
-    "Laser & Light": "from-gild/20 to-mineral/20 text-mineral",
-};
+const SERVICES = [
+  {
+    number: "01",
+    name: "Skin Concern",
+    subtitle: "Skin care",
+    icon: ScanFace,
+    services: [
+      "Acne & Acne Scar Treatment",
+      "Anti-Ageing & Wrinkle Reduction",
+      "Melasma & Pigmentation Treatment",
+      "Skin Rejuvenation",
+    ],
+  },
+  {
+    number: "02",
+    name: "Cosmetic Procedure",
+    subtitle: "Aesthetic procedures",
+    icon: Sparkles,
+    services: [
+      "Microdermabrasion",
+      "Chemical Peels",
+      "Mesotherapy",
+      "Microneedling",
+      "PRP & GFC Therapy",
+      "RF Skin Tightening",
+      "LED Light Therapy",
+    ],
+  },
+  {
+    number: "03",
+    name: "Medical Facials",
+    subtitle: "Facial treatments",
+    icon: Flower2,
+    services: [
+      "Hydra Facial",
+      "Oxy Facial",
+      "Carbon Laser Facial",
+      "Vampire (PRP) Facial",
+      "Korean Glass Skin Facial",
+    ],
+  },
+  {
+    number: "04",
+    name: "Hair",
+    subtitle: "Hair & scalp care",
+    icon: Leaf,
+    services: [
+      "Hair Fall Diagnosis",
+      "Hair Loss Treatment",
+      "Anti-dandruff Treatment",
+      "Alopecia Management",
+      "Hair Mesotherapy",
+      "Hair Microneedling",
+      "PRP And GFC Therapy",
+      "LED Light Therapy",
+    ],
+  },
+  {
+    number: "05",
+    name: "Laser",
+    subtitle: "Laser treatments",
+    icon: Zap,
+    services: [
+      "Laser Hair Reduction",
+      "Beard Shaping",
+      "Tattoo Removal",
+      "Carbon Laser Peel",
+      "Laser Skin Toning",
+    ],
+  },
+  {
+    number: "06",
+    name: "Minor Procedures",
+    subtitle: "Clinical procedures",
+    icon: Droplets,
+    services: [
+      "Ear Lobe Repair",
+      "Nail Avulsion",
+      "Wart And Skin Tag Excision",
+      "Mole Removal",
+      "Milia Extraction",
+    ],
+  },
+] as const;
+
+function getWhatsAppLink(category: string) {
+  const message =
+    `Hello Elysea Aesthetic Clinic, I would like to enquire about ${category} services.`;
+
+  return `https://wa.me/918141115873?text=${encodeURIComponent(message)}`;
+}
 
 export default function Treatments() {
-    const { openBooking } = useBooking();
-    const [filter, setFilter] = useState<Filter>("All");
-    const filtered =
-        filter === "All" ? TREATMENTS : TREATMENTS.filter((t) => t.category === filter);
-    const count = (f: Filter) =>
-        f === "All" ? TREATMENTS.length : TREATMENTS.filter((t) => t.category === f).length;
+  const reducedMotion = useReducedMotion();
 
-    return (
-        <section
-            id="treatments"
-            className="relative scroll-mt-24 bg-gradient-to-b from-porcelain to-cream py-24 sm:py-32"
+  return (
+    <section
+      id="treatments"
+      aria-labelledby="treatments-heading"
+      className="relative isolate overflow-hidden bg-gradient-to-b from-porcelain to-cream py-24 sm:py-28 lg:py-36"
+    >
+      {/* Background decoration */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-40 -top-28 h-[500px] w-[500px] rounded-full bg-blush/30 blur-[120px]"
+      />
+
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-40 -left-40 h-[450px] w-[450px] rounded-full bg-petal/15 blur-[120px]"
+      />
+
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+
+        {/* Section heading */}
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 22 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="mx-auto max-w-3xl text-center"
         >
-            <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 bg-[radial-gradient(circle_at_top_right,rgba(242,215,205,.7),transparent_70%)]" />
-            <div className="relative mx-auto max-w-7xl px-6">
-                <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-                    <SectionHeading
-                        eyebrow="Treatment menu"
-                        title={<>Choose your <Em>glow.</Em></>}
-                        description="Nine protocols, one philosophy: respect the barrier, chase the glow. Every plan begins with imaging-led analysis and ends with skin you recognise — only more luminous."
-                    />
-                    <Reveal delay={0.2} className="shrink-0">
-                        <div className="flex flex-wrap gap-2">
-                            {FILTERS.map((f) => {
-                                const active = filter === f;
-                                return (
-                                    <button
-                                        key={f}
-                                        type="button"
-                                        onClick={() => setFilter(f)}
-                                        className={cn(
-                                            "relative rounded-full px-5 py-2.5 text-sm font-semibold transition-colors",
-                                            active ? "text-cream" : "text-plum/60 hover:text-plum"
-                                        )}
-                                    >
-                                        {active && (
-                                            <motion.span
-                                                layoutId="filter-pill"
-                                                className="absolute inset-0 rounded-full bg-plum shadow-md"
-                                                transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                                            />
-                                        )}
-                                        <span className="relative z-10">
-                                            {f}
-                                            <span className={cn("ml-1.5 text-[10px] font-bold", active ? "text-gild" : "text-copper/70")}>
-                                                {count(f)}
-                                            </span>
-                                        </span>
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </Reveal>
+          <div className="mb-6 flex items-center justify-center gap-3">
+            <span className="h-px w-10 bg-copper/70" />
+
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-copper sm:text-[11px]">
+              Discover Elysea
+            </span>
+
+            <span className="h-px w-10 bg-copper/70" />
+          </div>
+
+          <h2
+            id="treatments-heading"
+            className="font-display text-[clamp(2.8rem,5.5vw,4.8rem)] font-medium leading-[1.08] tracking-[-0.04em] text-plum"
+          >
+            Our treatments
+
+            <span className="mt-2 block italic text-copper">
+              & services.
+            </span>
+          </h2>
+
+          <p className="mx-auto mt-6 max-w-2xl text-sm leading-[1.9] text-plum/65 sm:text-base">
+            Explore the range of skin, hair, laser and aesthetic
+            services offered at Elysea Aesthetic Clinic.
+          </p>
+
+          <div className="mt-7 flex items-center justify-center gap-2">
+            <span className="h-px w-8 bg-sand" />
+            <span className="font-display text-sm italic tracking-wide text-copper/80">
+              Skin · Hair · Laser
+            </span>
+            <span className="h-px w-8 bg-sand" />
+          </div>
+        </motion.div>
+
+        {/* Service categories */}
+        <div className="mt-14 grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3 lg:gap-6 sm:mt-16">
+
+          {SERVICES.map((category, index) => {
+            const Icon = category.icon;
+
+            return (
+              <motion.article
+                key={category.number}
+                initial={
+                  reducedMotion
+                    ? false
+                    : { opacity: 0, y: 28 }
+                }
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.12 }}
+                transition={{
+                  duration: 0.65,
+                  delay: reducedMotion ? 0 : (index % 3) * 0.1,
+                  ease: "easeOut",
+                }}
+                className="group relative flex flex-col overflow-hidden rounded-[1.8rem] border border-sand/80 bg-cream/90 p-6 shadow-[0_12px_40px_-30px_rgba(58,36,48,0.3)] transition-all duration-500 hover:-translate-y-1.5 hover:border-copper/40 hover:shadow-lift sm:p-7"
+              >
+
+                {/* Decorative corner detail */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full border border-copper/10 transition-transform duration-700 group-hover:scale-125"
+                />
+
+                {/* Card heading */}
+                <div className="relative flex items-start justify-between gap-3">
+
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-copper/80">
+                      {category.subtitle}
+                    </p>
+
+                    <h3 className="mt-2 font-display text-[1.65rem] font-medium leading-tight text-plum sm:text-[1.8rem]">
+                      {category.name}
+                    </h3>
+
+                    <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-plum/40">
+                      {String(category.services.length).padStart(2, "0")} Services
+                    </p>
+                  </div>
+
+                  <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-copper/15 bg-blush/45 text-copper transition-all duration-500 group-hover:rotate-[-6deg] group-hover:bg-plum group-hover:text-cream">
+                    <Icon className="h-5 w-5" strokeWidth={1.5} />
+                  </div>
+
                 </div>
 
-                <motion.div layout className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    <AnimatePresence mode="popLayout">
-                        {filtered.map((t) => {
-                            const Icon = t.icon;
-                            const index = TREATMENTS.findIndex((x) => x.id === t.id) + 1;
-                            return (
-                                <motion.article
-                                    layout
-                                    key={t.id}
-                                    initial={{ opacity: 0, scale: 0.94 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.94 }}
-                                    transition={{ duration: 0.35, ease: "easeOut" }}
-                                    className="group relative flex flex-col rounded-[1.75rem] border border-sand bg-cream p-7 transition-all duration-300 hover:-translate-y-1.5 hover:border-copper/40 hover:shadow-lift"
-                                >
-                                    <div className="flex items-start justify-between">
-                                        <span
-                                            className={cn(
-                                                "grid h-12 w-12 place-items-center rounded-2xl border border-white/60 bg-gradient-to-br transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110",
-                                                ICON_STYLES[t.category]
-                                            )}
-                                        >
-                                            <Icon className="h-5 w-5" />
-                                        </span>
-                                        <span className="font-display text-xl italic text-plum/25">
-                                            {String(index).padStart(2, "0")}
-                                        </span>
-                                    </div>
-                                    <div className="mt-5 flex items-center gap-2">
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-copper/80">
-                                            {t.category}
-                                        </span>
-                                        {t.flag && (
-                                            <Badge variant={t.flag === "New" ? "rose" : "gild"}>{t.flag}</Badge>
-                                        )}
-                                    </div>
-                                    <h3 className="mt-2 font-display text-2xl font-medium leading-snug text-plum">
-                                        {t.name}
-                                    </h3>
-                                    <p className="mt-2 flex-1 text-sm leading-relaxed text-plum/65">
-                                        {t.desc}
-                                    </p>
-                                    <div className="mt-5 flex items-center gap-3 border-t border-sand pt-4 text-sm text-plum/60">
-                                        <span className="flex items-center gap-1.5">
-                                            <Clock className="h-3.5 w-3.5 text-copper" />
-                                            {t.duration}
-                                        </span>
-                                        <span className="h-1 w-1 rounded-full bg-sand" />
-                                        <span>
-                                            from <span className="font-bold text-plum">${t.price}</span>
-                                        </span>
-                                    </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="group/btn mt-5 w-full justify-between"
-                                        onClick={() => openBooking(t.id)}
-                                    >
-                                        Book this treatment
-                                        <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5" />
-                                    </Button>
-                                </motion.article>
-                            );
-                        })}
-                    </AnimatePresence>
-                </motion.div>
+                {/* Divider */}
+                <div className="relative my-5 h-px bg-gradient-to-r from-copper/40 via-sand to-transparent" />
 
-                <Reveal delay={0.1} className="mt-10 text-center">
-                    <p className="text-sm text-plum/55">
-                        All treatments begin with a complimentary skin consultation. Prices vary by protocol.{" "}
-                        <button
-                            type="button"
-                            onClick={() => openBooking()}
-                            className="font-semibold text-copper underline-offset-4 hover:underline"
-                        >
-                            Not sure? Start with a consult →
-                        </button>
-                    </p>
-                </Reveal>
-            </div>
-        </section>
-    );
+                {/* Service list */}
+                <ul className="relative flex-1 space-y-3">
+                  {category.services.map((service) => (
+                    <li
+                      key={service}
+                      className="flex items-start gap-3 text-[13px] leading-[1.65] text-plum/75 sm:text-sm"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-copper/75"
+                      />
+
+                      <span>{service}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* WhatsApp enquiry */}
+                <div className="relative mt-7 border-t border-sand/70 pt-5">
+                  <a
+                    href={getWhatsAppLink(category.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Enquire about ${category.name} services on WhatsApp`}
+                    className="group/link inline-flex w-full items-center justify-between gap-3 text-xs font-semibold tracking-wide text-plum transition-colors duration-300 hover:text-copper"
+                  >
+                    <span>Enquire about these services</span>
+
+                    <span className="grid h-9 w-9 place-items-center rounded-full border border-sand transition-all duration-300 group-hover/link:border-copper group-hover/link:bg-plum group-hover/link:text-cream">
+                      <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
+                    </span>
+                  </a>
+                </div>
+
+              </motion.article>
+            );
+          })}
+
+        </div>
+
+        {/* Section closing */}
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="mt-14 flex flex-col items-center gap-4 border-t border-sand/80 pt-9 text-center"
+        >
+          <p className="font-display text-xl italic text-plum/80 sm:text-2xl">
+            Discover the services available at Elysea.
+          </p>
+
+          <a
+            href={getWhatsAppLink("all treatment categories")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[50px] items-center justify-center gap-3 rounded-full bg-plum px-7 py-4 text-xs font-semibold tracking-wide text-cream transition-all duration-300 hover:-translate-y-1 hover:bg-copper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4"
+          >
+            Enquire with Elysea
+
+            <ArrowUpRight className="h-4 w-4" />
+          </a>
+        </motion.div>
+
+      </div>
+    </section>
+  );
 }

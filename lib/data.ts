@@ -14,23 +14,40 @@ import {
 
 export const CLINIC = {
 	name: "Elysea Aesthetics",
+	city: "Bharuch",
+	region: "Gujarat",
+	country: "India",
 	address1: "FF-52, SHARNAM SKY, beside Jhulelal Hospital, Zadeshwar Chowkdi",
 	address2: "Ganesh Shrishti, Zadeshwar, Bharuch, Gujarat 392011",
 	phone: "+91 81411 15873",
 	phoneHref: "tel:+918141115873",
 	email: "hello@elysea.clinic",
-	instagram: "https://www.instagram.com/",
-	facebook: "https://www.facebook.com/",
-	youtube: "https://www.youtube.com/",
+	/** Set real profile URLs when available; empty string hides the icon */
+	instagram: "",
+	facebook: "",
+	youtube: "",
 	mapsUrl: "https://maps.app.goo.gl/b64q4EErcJeBsH5z5",
+	timezone: "Asia/Kolkata",
+	timezoneLabel: "IST",
+	currency: "INR" as const,
+	foundedYear: 2016,
 };
+
+/** Format a treatment price in Indian Rupees (e.g. ₹18,000) */
+export function formatPrice(amount: number): string {
+	return new Intl.NumberFormat("en-IN", {
+		style: "currency",
+		currency: "INR",
+		maximumFractionDigits: 0,
+	}).format(amount);
+}
 
 export const NAV_LINKS = [
 	{ label: "Story", href: "#story" },
 	{ label: "Treatments", href: "#treatments" },
 	{ label: "The Method", href: "#philosophy" },
 	{ label: "Results", href: "#results" },
-	{ label: "Journal", href: "#journal" },
+	// { label: "Journal", href: "#journal" },
 	{ label: "FAQ", href: "#faq" },
 	{ label: "Visit", href: "#visit" },
 ];
@@ -57,7 +74,7 @@ export const TREATMENTS: Treatment[] = [
 		category: "Facials",
 		desc: "Our flagship seven-step protocol: enzyme cleanse, gentle peel, oxygen infusion, peptide mask and cryo-glass finish.",
 		duration: "90 min",
-		price: 260,
+		price: 18000,
 		icon: Sparkles,
 		flag: "Most loved",
 	},
@@ -67,7 +84,7 @@ export const TREATMENTS: Treatment[] = [
 		category: "Facials",
 		desc: "Vortex extraction and hyaluronic saturation for skin that drinks. Zero downtime, immediate red-carpet luminosity.",
 		duration: "60 min",
-		price: 180,
+		price: 12000,
 		icon: Droplets,
 	},
 	{
@@ -76,7 +93,7 @@ export const TREATMENTS: Treatment[] = [
 		category: "Facials",
 		desc: "A PHA-acid resurfacing veil buffered with rose stem cells and peptides. Refines texture without the sting.",
 		duration: "45 min",
-		price: 140,
+		price: 9000,
 		icon: Flower2,
 	},
 	{
@@ -85,7 +102,7 @@ export const TREATMENTS: Treatment[] = [
 		category: "Injectables",
 		desc: "Micro-dosed neuromodulator mapped to your expression patterns. Softens lines, keeps every smile yours.",
 		duration: "30 min",
-		price: 290,
+		price: 15000,
 		icon: Syringe,
 	},
 	{
@@ -94,7 +111,7 @@ export const TREATMENTS: Treatment[] = [
 		category: "Injectables",
 		desc: "Hyaluronic sculpting of cheeks, chin and jawline in staged, conservative layers. Structure, not volume.",
 		duration: "45 min",
-		price: 420,
+		price: 28000,
 		icon: Gem,
 	},
 	{
@@ -103,7 +120,7 @@ export const TREATMENTS: Treatment[] = [
 		category: "Injectables",
 		desc: "Injectable hyaluronic bio-remodelling that hydrates from within and wakes up collagen across the whole face.",
 		duration: "30 min",
-		price: 350,
+		price: 22000,
 		icon: Waves,
 		flag: "New",
 	},
@@ -113,7 +130,7 @@ export const TREATMENTS: Treatment[] = [
 		category: "Laser & Light",
 		desc: "Columned laser renewal for scars, pores and sun history. Physician-calibrated depth, comfort-first protocol.",
 		duration: "60 min",
-		price: 380,
+		price: 25000,
 		icon: Zap,
 	},
 	{
@@ -122,7 +139,7 @@ export const TREATMENTS: Treatment[] = [
 		category: "Laser & Light",
 		desc: "Broad-spectrum light that quietly erases redness, rosacea flush and pigment scatter over a three-session arc.",
 		duration: "45 min",
-		price: 240,
+		price: 16000,
 		icon: Sun,
 	},
 	{
@@ -131,7 +148,7 @@ export const TREATMENTS: Treatment[] = [
 		category: "Laser & Light",
 		desc: "Clinical red and near-infrared light to calm, repair and rebuild. The perfect finisher after any protocol.",
 		duration: "30 min",
-		price: 90,
+		price: 5500,
 		icon: Leaf,
 	},
 ];
@@ -258,7 +275,7 @@ export const FAQS = [
 	},
 	{
 		q: "What is your cancellation policy?",
-		a: "Reschedule or cancel free of charge up to 24 hours before your visit — no deposit is ever taken. Cancellations inside 24 hours carry a $50 fee, credited toward your next booking if you rebook within a month.",
+		a: "Reschedule or cancel free of charge up to 24 hours before your visit — no deposit is ever taken. Cancellations inside 24 hours carry a ₹2,000 fee, credited toward your next booking if you rebook within a month.",
 	},
 ];
 

@@ -5,7 +5,7 @@ import Story from "@/components/story";
 import Treatments from "@/components/treatments";
 import Ritual from "@/components/ritual";
 import Results from "@/components/results";
-import Journal from "@/components/journal";
+// import Journal from "@/components/journal";
 import Faq from "@/components/faq";
 import Visit from "@/components/visit";
 import Footer from "@/components/footer";
@@ -20,7 +20,7 @@ export default function Page() {
             <Treatments />
             <Ritual />
             <Results />
-            <Journal />
+            {/* <Journal /> */}
             <Faq />
             <Visit />
             <Footer />

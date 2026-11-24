@@ -1,304 +1,213 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import {
-    AnimatePresence,
-    motion,
-    useInView,
-    useReducedMotion,
-} from "framer-motion";
-import {
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeftRight,
-    Quote,
-    Star,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-    Counter,
-    Em,
-    Monogram,
-    Reveal,
-    SectionHeading,
-    Sparkle,
-} from "@/components/primitives";
-import { useBooking } from "@/components/booking";
-import { METRICS, TESTIMONIALS } from "@/lib/data";
-import { cn } from "@/lib/utils";
-
-const BEFORE_SPOTS = [
-    "radial-gradient(circle at 28% 32%, rgba(160,88,52,.4) 0 5%, transparent 11%)",
-    "radial-gradient(circle at 62% 22%, rgba(170,96,60,.35) 0 4%, transparent 9%)",
-    "radial-gradient(circle at 44% 58%, rgba(150,80,48,.38) 0 6%, transparent 13%)",
-    "radial-gradient(circle at 74% 48%, rgba(178,100,62,.32) 0 4%, transparent 10%)",
-    "radial-gradient(circle at 20% 72%, rgba(160,88,52,.35) 0 5%, transparent 11%)",
-    "radial-gradient(circle at 58% 80%, rgba(150,80,48,.3) 0 4%, transparent 9%)",
-    "radial-gradient(circle at 82% 74%, rgba(170,96,60,.28) 0 3%, transparent 8%)",
-    "radial-gradient(circle at 36% 16%, rgba(150,80,48,.3) 0 3%, transparent 8%)",
-].join(", ");
-
-function BeforeAfter() {
-    const ref = useRef<HTMLDivElement>(null);
-    const dragging = useRef(false);
-    const [pos, setPos] = useState(58);
-    const [touched, setTouched] = useState(false);
-
-    const update = (clientX: number) => {
-        const rect = ref.current?.getBoundingClientRect();
-        if (!rect) return;
-        setPos(Math.min(96, Math.max(4, ((clientX - rect.left) / rect.width) * 100)));
-    };
-
-    return (
-        <div className="overflow-hidden rounded-[2rem] border border-sand bg-cream shadow-lift">
-            <div
-                ref={ref}
-                role="slider"
-                tabIndex={0}
-                aria-label="Compare skin before and after treatment"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={Math.round(pos)}
-                onPointerDown={(e) => {
-                    dragging.current = true;
-                    setTouched(true);
-                    e.currentTarget.setPointerCapture(e.pointerId);
-                    update(e.clientX);
-                }}
-                onPointerMove={(e) => {
-                    if (dragging.current) update(e.clientX);
-                }}
-                onPointerUp={() => {
-                    dragging.current = false;
-                }}
-                onPointerCancel={() => {
-                    dragging.current = false;
-                }}
-                onKeyDown={(e) => {
-                    if (e.key === "ArrowLeft") { setTouched(true); setPos((p) => Math.max(4, p - 4)); }
-                    if (e.key === "ArrowRight") { setTouched(true); setPos((p) => Math.min(96, p + 4)); }
-                    if (e.key === "Home") setPos(4);
-                    if (e.key === "End") setPos(96);
-                }}
-                className="relative h-[340px] cursor-ew-resize touch-none select-none outline-none focus-visible:ring-2 focus-visible:ring-gild sm:h-[420px]"
-            >
-                {/* AFTER */}
-                <div className="absolute inset-0 bg-[linear-gradient(135deg,#F6DAC9,#EDC3AE_50%,#E5B49E)]">
-                    <div className="absolute -left-10 -top-10 h-56 w-56 rounded-full bg-white/40 blur-2xl" />
-                    <Sparkle className="absolute left-[68%] top-[24%] h-4 w-4 animate-float text-cream/90" />
-                    <Sparkle className="absolute left-[80%] top-[58%] h-3 w-3 animate-float text-cream/80 [animation-delay:1.2s]" />
-                    <Sparkle className="absolute left-[60%] top-[76%] h-2.5 w-2.5 animate-float text-gild/80 [animation-delay:2.1s]" />
-                    <span className="absolute right-4 top-4 rounded-full bg-cream/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-sage shadow-sm">
-                        Week 8 · After
-                    </span>
-                </div>
-                {/* BEFORE */}
-                <div
-                    className="absolute inset-0"
-                    style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
-                >
-                    <div
-                        className="absolute inset-0 bg-[linear-gradient(135deg,#E8C4B0,#D9A98F_45%,#C9917A)]"
-                        style={{ backgroundImage: `${BEFORE_SPOTS}, linear-gradient(135deg,#E8C4B0,#D9A98F_45%,#C9917A)` }}
-                    />
-                    <div className="absolute inset-0 bg-plum/10" />
-                    <span className="absolute left-4 top-4 rounded-full bg-ink/60 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cream backdrop-blur">
-                        Week 0 · Before
-                    </span>
-                </div>
-                {/* Handle */}
-                <div className="absolute inset-y-0" style={{ left: `${pos}%` }}>
-                    <div className="absolute inset-y-0 -ml-[1.5px] w-[3px] bg-cream shadow-[0_0_12px_rgba(33,18,25,.4)]" />
-                    <div className="absolute top-1/2 -ml-6 -mt-6 grid h-12 w-12 place-items-center rounded-full border-2 border-copper bg-cream shadow-lift">
-                        <ChevronsLeftRight className="h-5 w-5 text-plum" />
-                    </div>
-                </div>
-                <AnimatePresence>
-                    {!touched && (
-                        <motion.span
-                            exit={{ opacity: 0, y: 8 }}
-                            className="pointer-events-none absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-ink/70 px-3.5 py-1.5 text-[11px] font-semibold text-cream backdrop-blur"
-                        >
-                            <ChevronLeft className="h-3 w-3" /> drag to compare <ChevronRight className="h-3 w-3" />
-                        </motion.span>
-                    )}
-                </AnimatePresence>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-sand px-5 py-3 text-xs text-plum/55">
-                <span className="font-semibold">Fractional resurfacing · 3 sessions</span>
-                <span>Illustrative simulation — individual results vary</span>
-            </div>
-        </div>
-    );
-}
-
-function Metric({
-    label,
-    value,
-    gradient,
-    delay,
-}: {
-    label: string;
-    value: number;
-    gradient: string;
-    delay: number;
-}) {
-    const ref = useRef<HTMLDivElement>(null);
-    const inView = useInView(ref, { once: true, margin: "-40px" });
-    return (
-        <div ref={ref}>
-            <div className="flex items-baseline justify-between text-sm font-semibold text-plum">
-                <span>{label}</span>
-                <Counter value={value} prefix="+" suffix="%" className="font-display text-xl text-copper" />
-            </div>
-            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-sand/70">
-                <motion.div
-                    className={cn("h-full rounded-full bg-gradient-to-r", gradient)}
-                    initial={{ width: 0 }}
-                    animate={inView ? { width: `${value}%` } : { width: 0 }}
-                    transition={{ duration: 1.3, delay, ease: [0.16, 1, 0.3, 1] }}
-                />
-            </div>
-        </div>
-    );
-}
-
-function Testimonials() {
-    const [index, setIndex] = useState(0);
-    const [paused, setPaused] = useState(false);
-    const reduced = useReducedMotion();
-    const t = TESTIMONIALS[index];
-
-    useEffect(() => {
-        if (paused || reduced) return;
-        const id = window.setInterval(
-            () => setIndex((i) => (i + 1) % TESTIMONIALS.length),
-            6500
-        );
-        return () => window.clearInterval(id);
-    }, [paused, reduced, index]);
-
-    return (
-        <div
-            className="mx-auto mt-24 max-w-3xl text-center"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-        >
-            <Reveal>
-                <Quote className="mx-auto h-10 w-10 text-gild/60" />
-                <div className="mt-4 flex justify-center gap-1">
-                    {[0, 1, 2, 3, 4].map((s) => (
-                        <Star key={s} className="h-4 w-4 fill-gild text-gild" />
-                    ))}
-                </div>
-            </Reveal>
-            <div aria-live="polite" className="mt-6 min-h-[150px] sm:min-h-[130px]">
-                <AnimatePresence mode="wait">
-                    <motion.figure
-                        key={index}
-                        initial={{ opacity: 0, y: 24 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -24 }}
-                        transition={{ duration: 0.45, ease: "easeOut" }}
-                    >
-                        <blockquote className="font-display text-2xl font-medium leading-snug text-plum sm:text-[1.75rem]">
-                            “{t.quote}”
-                        </blockquote>
-                        <figcaption className="mt-6 flex items-center justify-center gap-3">
-                            <Monogram initials={t.initials} gradient={t.gradient} className="h-10 w-10" />
-                            <span className="text-left">
-                                <span className="block text-sm font-bold text-plum">{t.name}</span>
-                                <span className="block text-xs text-plum/55">
-                                    {t.treatment} · {t.since}
-                                </span>
-                            </span>
-                        </figcaption>
-                    </motion.figure>
-                </AnimatePresence>
-            </div>
-            <div className="mt-8 flex items-center justify-center gap-4">
-                <button
-                    type="button"
-                    aria-label="Previous testimonial"
-                    onClick={() => setIndex((i) => (i - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)}
-                    className="grid h-10 w-10 place-items-center rounded-full border border-sand text-plum transition-colors hover:border-copper hover:text-copper"
-                >
-                    <ChevronLeft className="h-4 w-4" />
-                </button>
-                <div className="flex gap-2">
-                    {TESTIMONIALS.map((_, i) => (
-                        <button
-                            key={i}
-                            type="button"
-                            aria-label={`Go to testimonial ${i + 1}`}
-                            onClick={() => setIndex(i)}
-                            className={cn(
-                                "h-2 rounded-full transition-all duration-300",
-                                i === index ? "w-6 bg-copper" : "w-2 bg-sand hover:bg-petal"
-                            )}
-                        />
-                    ))}
-                </div>
-                <button
-                    type="button"
-                    aria-label="Next testimonial"
-                    onClick={() => setIndex((i) => (i + 1) % TESTIMONIALS.length)}
-                    className="grid h-10 w-10 place-items-center rounded-full border border-sand text-plum transition-colors hover:border-copper hover:text-copper"
-                >
-                    <ChevronRight className="h-4 w-4" />
-                </button>
-            </div>
-        </div>
-    );
-}
+import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, MapPin } from "lucide-react";
 
 export default function Results() {
-    const { openBooking } = useBooking();
-    return (
-        <section
-            id="results"
-            className="relative scroll-mt-24 bg-gradient-to-b from-cream via-blush/40 to-porcelain py-24 sm:py-32"
+  const reducedMotion = useReducedMotion();
+
+  const reveal = (delay: number) => ({
+    initial: reducedMotion ? false : { opacity: 0, y: 24 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, amount: 0.15 },
+    transition: {
+      duration: 0.8,
+      delay,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  });
+
+  return (
+    <section
+      id="results"
+      aria-labelledby="clinic-gallery-heading"
+      className="relative isolate overflow-hidden bg-porcelain py-24 sm:py-28 lg:py-36"
+    >
+      {/* Background atmosphere */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-40 top-0 h-[500px] w-[500px] rounded-full bg-blush/25 blur-[120px]"
+      />
+
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+
+        {/* Heading */}
+        <motion.div
+          {...reveal(0)}
+          className="mb-12 flex flex-col justify-between gap-5 lg:mb-16 lg:flex-row lg:items-end"
         >
-            <div className="mx-auto max-w-7xl px-6">
-                <SectionHeading
-                    eyebrow="Results"
-                    title={<>Proof, not <Em>promises.</Em></>}
-                    description="We photograph, measure and re-measure. Drag the line to see an eight-week resurfacing arc — then read what our clients say when the numbers become a mirror."
-                />
-                <div className="mt-12 grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
-                    <Reveal>
-                        <BeforeAfter />
-                    </Reveal>
-                    <div>
-                        <Reveal delay={0.1}>
-                            <h3 className="font-display text-2xl font-medium text-plum sm:text-3xl">
-                                Eight weeks, measured.
-                            </h3>
-                            <p className="mt-3 leading-relaxed text-plum/65">
-                                Average clinical measurements across 120 clients on staged
-                                eight-week protocols — corneometry for hydration, VISIA texture
-                                scoring, and cross-polarised tone analysis.
-                            </p>
-                        </Reveal>
-                        <div className="mt-8 space-y-6">
-                            {METRICS.map((m, i) => (
-                                <Metric key={m.label} label={m.label} value={m.value} gradient={m.gradient} delay={0.15 + i * 0.15} />
-                            ))}
-                        </div>
-                        <Reveal delay={0.3}>
-                            <p className="mt-6 text-xs text-plum/50">
-                                Visual above is an illustrative simulation. Your own before-and-after
-                                imaging is included in every Glow Plan.
-                            </p>
-                            <Button variant="link" className="mt-2 h-auto p-0 text-sm font-bold" onClick={() => openBooking()}>
-                                Start with a complimentary consultation →
-                            </Button>
-                        </Reveal>
-                    </div>
-                </div>
-                <Testimonials />
+          <div className="max-w-2xl">
+
+            <div className="mb-6 flex items-center gap-3">
+              <span className="h-px w-10 bg-copper" />
+
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-copper sm:text-[11px]">
+                A glimpse inside Elysea
+              </span>
             </div>
-        </section>
-    );
+
+            <h2
+              id="clinic-gallery-heading"
+              className="font-display text-[clamp(2.8rem,5.5vw,4.8rem)] font-medium leading-[1.08] tracking-[-0.04em] text-plum"
+            >
+              A space that feels
+
+              <span className="mt-2 block italic text-copper">
+                like Elysea.
+              </span>
+            </h2>
+          </div>
+
+          <p className="max-w-md text-sm leading-[1.95] text-plum/65 sm:text-base">
+            Take a closer look at Elysea Aesthetic Clinic.
+            Explore our reception, discover our identity
+            and find us in Zadeshwar, Bharuch.
+          </p>
+        </motion.div>
+
+        {/* Photography layout */}
+        <div className="grid items-stretch gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6">
+
+          {/* Main reception photograph */}
+          <motion.figure
+            {...reveal(0.1)}
+            className="group relative min-h-[440px] overflow-hidden rounded-[2rem] border border-white/70 bg-sand shadow-[0_24px_65px_-35px_rgba(58,36,48,0.4)] sm:min-h-[560px] lg:min-h-[660px]"
+          >
+
+            <Image
+              src="/images/clinic/elysea-reception-portrait.jpg"
+              alt="Reception area at Elysea Aesthetic Clinic in Bharuch"
+              fill
+              sizes="(max-width: 1024px) 100vw, 52vw"
+              className="object-cover object-center transition-transform duration-1000 group-hover:scale-[1.025]"
+            />
+
+            <div className="absolute inset-0 bg-gradient-to-t from-plum/70 via-transparent to-plum/5" />
+
+            <figcaption className="absolute inset-x-0 bottom-0 p-6 sm:p-9">
+
+              <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/75">
+                Welcome to Elysea
+              </p>
+
+              <p className="mt-2 font-display text-3xl italic text-white sm:text-4xl">
+                Our reception
+              </p>
+
+              <p className="mt-2 max-w-sm text-xs leading-6 text-white/75 sm:text-sm">
+                Visit us at our clinic in Sharnam Sky,
+                Zadeshwar, Bharuch.
+              </p>
+
+            </figcaption>
+
+          </motion.figure>
+
+          {/* Supporting content */}
+          <div className="grid gap-5 lg:grid-rows-[1.05fr_0.95fr] lg:gap-6">
+
+            {/* Elysea branding photograph */}
+            <motion.figure
+              {...reveal(0.2)}
+              className="group relative min-h-[270px] overflow-hidden rounded-[2rem] border border-white/70 bg-sand shadow-[0_20px_55px_-35px_rgba(58,36,48,0.35)] sm:min-h-[340px] lg:min-h-0"
+            >
+
+              <Image
+                src="/images/clinic/elysea-logo-wall.jpg"
+                alt="Elysea butterfly and face logo displayed on the clinic wall"
+                fill
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                className="object-cover object-center transition-transform duration-1000 group-hover:scale-[1.035]"
+              />
+
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum/65 to-transparent p-6 sm:p-7">
+
+                <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-white/75">
+                  Our identity
+                </p>
+
+                <p className="mt-2 font-display text-2xl italic text-white sm:text-3xl">
+                  The Elysea experience
+                </p>
+
+              </div>
+
+            </motion.figure>
+
+            {/* Clinic address card */}
+            <motion.div
+              {...reveal(0.3)}
+              className="relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-plum p-7 text-cream shadow-[0_20px_55px_-30px_rgba(58,36,48,0.5)] sm:p-9"
+            >
+
+              {/* Decorative element */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full border border-white/10"
+              />
+
+              <div className="relative">
+
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-4 w-4 text-gild" />
+
+                  <span className="text-[9px] font-bold uppercase tracking-[0.27em] text-gild">
+                    Find us in Bharuch
+                  </span>
+                </div>
+
+                <h3 className="mt-5 font-display text-2xl font-medium leading-tight text-cream sm:text-3xl">
+                  Your visit to
+                  <span className="block italic text-gild">
+                    Elysea.
+                  </span>
+                </h3>
+
+                <p className="mt-5 max-w-md text-sm leading-[1.9] text-cream/70">
+                  FF-52, Sharnam Sky, beside Jhulelal Hospital,
+                  Zadeshwar Chowkdi, Ganesh Shrishti,
+                  Zadeshwar, Bharuch, Gujarat 392011.
+                </p>
+
+              </div>
+
+              <div className="relative mt-8 border-t border-white/15 pt-5">
+
+                <a
+                  href="#visit"
+                  className="group inline-flex items-center gap-3 text-xs font-semibold tracking-wide text-cream transition-colors duration-300 hover:text-gild"
+                >
+                  Explore location and timings
+
+                  <span className="grid h-9 w-9 place-items-center rounded-full border border-white/20 transition-all duration-300 group-hover:border-gild group-hover:bg-gild group-hover:text-plum">
+                    <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </span>
+                </a>
+
+              </div>
+
+            </motion.div>
+
+          </div>
+
+        </div>
+
+        {/* Closing statement */}
+        <motion.div
+          {...reveal(0.35)}
+          className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-sand pt-7 sm:flex-row sm:pt-9"
+        >
+          <p className="font-display text-xl italic text-plum/80 sm:text-2xl">
+            Elysea Aesthetic Clinic
+          </p>
+
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-copper">
+            Skin · Hair · Laser
+          </p>
+        </motion.div>
+
+      </div>
+    </section>
+  );
 }

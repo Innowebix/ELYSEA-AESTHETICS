@@ -22,20 +22,22 @@ const sans = Manrope({
 export const metadata: Metadata = {
     title: "Elysea Aesthetics — The Art of Luminous Skin",
     description:
-        "A physician-led aesthetic clinic in Beverly Grove. The quiet hour: listening first, imaging second, and skin that lets you meet your own reflection again.",
+        "A physician-led aesthetic clinic in Bharuch, Gujarat. The quiet hour: listening first, imaging second, and skin that lets you meet your own reflection again.",
     keywords: [
         "aesthetic clinic",
-        "skin clinic los angeles",
-        "hydrafacial",
-        "laser resurfacing",
+        "skin clinic Bharuch",
+        "aesthetic clinic Gujarat",
+        "hydrafacial Bharuch",
+                "laser resurfacing",
         "injectables",
         "elysea aesthetics",
     ],
     openGraph: {
         title: "Elysea Aesthetics — The Art of Luminous Skin",
         description:
-            "You are not a before photo. Book a complimentary quiet hour at Elysea Aesthetics.",
+            "You are not a before photo. Book a complimentary quiet hour at Elysea Aesthetics in Bharuch.",
         type: "website",
+        locale: "en_IN",
     },
 };
 

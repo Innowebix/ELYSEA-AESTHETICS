@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { useEffect, useRef, type ReactNode } from "react";
 import {
     animate,
@@ -86,7 +88,7 @@ export function SectionHeading({
                 <span
                     className={cn(
                         "inline-flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em]",
-                        tone === "dark" ? "text-copper" : "text-gild"
+                        tone === "dark" ? "text-copper" : "text-[#D8B27C]"
                     )}
                 >
                     <motion.span
@@ -229,21 +231,23 @@ export function Logo({
             className={cn("group flex items-center gap-2.5 text-left", className)}
             aria-label="Elysea Aesthetics — back to top"
         >
-            <span className="relative grid h-9 w-9 place-items-center">
-                <span
-                    className={cn(
-                        "absolute inset-0 rounded-full transition-transform duration-700 group-hover:rotate-180",
-                        tone === "dark" ? "bg-plum" : "bg-cream"
-                    )}
+            <span className={cn("relative grid h-12 w-12 shrink-0 place-items-center transition-all duration-500 group-hover:-translate-y-0.5",tone==="light"?"overflow-hidden rounded-[14px] border border-white/70 bg-[#FFF9F0] p-1 shadow-[0_5px_18px_rgba(0,0,0,0.32)]":"rounded-full")}>
+                {tone==="dark"&&<span className="logo-halo absolute inset-1 rounded-full bg-gild/20 blur-md"/>}
+                <Image
+                    src="/images/brand/elysea-emblem.png"
+                    alt=""
+                    width={48}
+                    height={48}
+                    sizes="44px"
+                    draggable={false}
+                    className="relative h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
                 />
-                <span className="logo-halo absolute inset-0 rounded-full bg-gild/25 blur-md" />
-                <Sparkle className="relative h-4 w-4 text-gild transition-transform duration-700 group-hover:scale-125" />
             </span>
             <span className="flex flex-col">
                 <span
                     className={cn(
                         "font-display text-lg font-semibold leading-none tracking-[0.22em]",
-                        tone === "dark" ? "text-plum" : "text-cream"
+                        tone === "dark" ? "text-plum" : "text-[#FFF9F0]"
                     )}
                 >
                     ELYSEA
