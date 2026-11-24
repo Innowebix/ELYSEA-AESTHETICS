@@ -22,26 +22,19 @@ import {
 
 import { Logo } from "@/components/primitives";
 import { useSmoothScroll } from "@/components/smooth-scroll";
-import { CLINIC } from "@/lib/data";
+import { CLINIC, SERVICE_CATEGORIES, createWhatsAppUrl } from "@/lib/clinic";
 
-const WHATSAPP_URL =
-  "https://wa.me/918141115873?text=Hello%20Elysea%20Aesthetic%20Clinic%2C%20I%20would%20like%20to%20make%20an%20enquiry.";
+const WHATSAPP_URL = createWhatsAppUrl(
+  "Hello Elysea Aesthetic Clinic, I would like to enquire about your services."
+);
 
 const NAVIGATION = [
   { label: "Meet the Doctor", href: "#story" },
   { label: "Treatments & Services", href: "#treatments" },
+  { label: "The Method", href: "#philosophy" },
   { label: "Our Clinic", href: "#results" },
   { label: "FAQs", href: "#faq" },
   { label: "Visit Us", href: "#visit" },
-];
-
-const SERVICE_CATEGORIES = [
-  "Skin Concerns",
-  "Cosmetic Procedures",
-  "Medical Facials",
-  "Hair",
-  "Laser",
-  "Minor Procedures",
 ];
 
 export default function Footer() {
@@ -191,8 +184,8 @@ export default function Footer() {
 
             <ul className="mt-5 space-y-3.5">
 
-              {SERVICE_CATEGORIES.map((category, index) => (
-                <li key={category}>
+              {SERVICE_CATEGORIES.map((category) => (
+                <li key={category.number}>
                   <a
                     href="#treatments"
                     onClick={(event) => {
@@ -202,10 +195,10 @@ export default function Footer() {
                     className="group inline-flex items-center gap-2 text-sm text-cream/60 transition-colors duration-300 hover:text-gild"
                   >
                     <span className="text-[9px] tracking-wider text-gild/65">
-                      0{index + 1}
+                      {category.number}
                     </span>
 
-                    <span>{category}</span>
+                    <span>{category.name}</span>
                   </a>
                 </li>
               ))}
@@ -229,35 +222,29 @@ export default function Footer() {
                 <MapPin className="mt-1 h-4 w-4 shrink-0 text-gild" />
 
                 <p className="text-sm leading-[1.85] text-cream/60">
-                  FF-52, Sharnam Sky,
-                  <br />
-                  Beside Jhulelal Hospital,
-                  Zadeshwar Chowkdi,
-                  <br />
-                  Ganesh Shrishti, Zadeshwar,
-                  Bharuch, Gujarat.
+                  {CLINIC.fullAddress}
                 </p>
 
               </div>
 
               {/* Phone */}
               <a
-                href="tel:+918141115873"
+                href={CLINIC.phoneHref}
                 className="flex items-center gap-3 text-sm text-cream/60 transition-colors hover:text-gild"
               >
                 <Phone className="h-4 w-4 shrink-0 text-gild" />
 
-                +91 81411 15873
+                {CLINIC.phone}
               </a>
 
               {/* Email */}
               <a
-                href="mailto:elysea.aesthetics@gmail.com"
+                href={CLINIC.emailHref}
                 className="flex items-start gap-3 break-all text-sm text-cream/60 transition-colors hover:text-gild"
               >
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-gild" />
 
-                elysea.aesthetics@gmail.com
+                {CLINIC.email}
               </a>
 
             </address>
@@ -272,7 +259,7 @@ export default function Footer() {
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-cream/10 pt-7 text-xs text-cream/40 sm:flex-row">
 
           <p>
-            © {new Date().getFullYear()} Elysea Aesthetic Clinic.
+            © Elysea Aesthetic Clinic.
             All rights reserved.
           </p>
 

@@ -1,15 +1,7 @@
 import { Sparkle } from "@/components/primitives";
+import { SERVICE_CATEGORIES } from "@/lib/clinic";
 
-const ITEMS = [
-    "Glass-Skin Ritual",
-    "HydraGlow",
-    "Bio-Remodelling",
-    "Laser Resurfacing",
-    "Peptide Peels",
-    "LED Therapy",
-    "Skin Mapping",
-    "Anti-Wrinkle Refinement",
-];
+const ITEMS = SERVICE_CATEGORIES.map((category) => category.name);
 
 export default function Marquee() {
     return (

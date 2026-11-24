@@ -8,18 +8,11 @@ import {
   MapPin,
   Star,
 } from "lucide-react";
+import { CLINIC, createWhatsAppUrl } from "@/lib/clinic";
 
-const WHATSAPP_URL =
-  "https://wa.me/918141115873?text=Hello%20Elysea%20Aesthetic%20Clinic%2C%20I%20would%20like%20to%20enquire%20about%20your%20services.";
-
-const SERVICE_CATEGORIES = [
-  "Skin Concerns",
-  "Cosmetic Procedures",
-  "Medical Facials",
-  "Hair",
-  "Laser",
-  "Minor Procedures",
-];
+const WHATSAPP_URL = createWhatsAppUrl(
+  "Hello Elysea Aesthetic Clinic, I would like to enquire about your services."
+);
 
 export default function Hero() {
   const reducedMotion = useReducedMotion();
@@ -149,7 +142,13 @@ export default function Hero() {
               className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5 border-t border-sand/90 pt-7"
             >
               <div>
-                <div className="flex items-center gap-2">
+                <a
+                  href={CLINIC.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copper"
+                  aria-label={`Read Elysea's ${CLINIC.rating} out of 5 Google rating and reviews`}
+                >
                   <div className="flex items-center gap-0.5 text-gild">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
@@ -160,12 +159,12 @@ export default function Hero() {
                   </div>
 
                   <span className="text-sm font-bold text-plum">
-                    4.7/5
+                    {CLINIC.rating.toFixed(1)}/5
                   </span>
-                </div>
+                </a>
 
                 <p className="mt-1 text-xs text-plum/55">
-                  Google rating · 19 reviews
+                  Google rating · {CLINIC.googleReviewCount} reviews
                 </p>
               </div>
 
@@ -256,38 +255,6 @@ export default function Hero() {
           </motion.div>
 
         </div>
-
-        {/* Service category strip */}
-        <motion.div
-          {...entrance(0.8, 16)}
-          className="mt-24 border-t border-sand pt-7 lg:mt-28"
-        >
-          <div className="mb-5 flex items-center justify-between gap-4">
-            <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-copper sm:text-[10px]">
-              Explore our services
-            </p>
-
-            <p className="text-[9px] uppercase tracking-[0.18em] text-plum/40">
-              Six areas of care
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-x-5 gap-y-4 sm:grid-cols-3 lg:grid-cols-6 lg:gap-4">
-            {SERVICE_CATEGORIES.map((category, index) => (
-              <a
-                key={category}
-                href="#treatments"
-                className="group flex items-center gap-2 border-b border-sand/70 pb-3 text-xs font-medium text-plum/70 transition-colors duration-300 hover:border-copper hover:text-copper sm:text-[13px]"
-              >
-                <span className="font-display text-sm italic text-copper/70">
-                  0{index + 1}
-                </span>
-
-                <span>{category}</span>
-              </a>
-            ))}
-          </div>
-        </motion.div>
 
       </div>
     </section>

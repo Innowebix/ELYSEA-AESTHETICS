@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
-import { ArrowUp, ArrowUpRight, Menu, Phone, Sparkles, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
+import { ArrowUp, ArrowUpRight, Menu, Phone, MessageCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/primitives";
 import { EASE_OUT, Magnetic } from "@/components/motion";
 import { useSmoothScroll } from "@/components/smooth-scroll";
-import { useBooking } from "@/components/booking";
-import { CLINIC } from "@/lib/data";
+import { CLINIC, createWhatsAppUrl } from "@/lib/clinic";
 import { STORY_LINKS } from "@/lib/story";
 import { cn } from "@/lib/utils";
 
 function ScrollProgress() {
     const { scrollYProgress } = useScroll();
+    const reducedMotion = useReducedMotion();
     const scaleX = useSpring(scrollYProgress, {
         stiffness: 120,
         damping: 28,
@@ -21,7 +21,7 @@ function ScrollProgress() {
     });
     return (
         <motion.div
-            style={{ scaleX }}
+            style={{ scaleX: reducedMotion ? scrollYProgress : scaleX }}
             className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-copper via-rose to-gild"
             aria-hidden="true"
         />
@@ -30,11 +30,15 @@ function ScrollProgress() {
 
 export default function Navbar() {
     const { scrollTo, stop, start } = useSmoothScroll();
-    const { openBooking } = useBooking();
+    const reducedMotion = useReducedMotion();
     const [scrolled, setScrolled] = useState(false);
     const [showTop, setShowTop] = useState(false);
     const [active, setActive] = useState("home");
     const [menuOpen, setMenuOpen] = useState(false);
+    const menuButtonRef = useRef<HTMLButtonElement>(null);
+    const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const wasMenuOpenRef = useRef(false);
 
     useEffect(() => {
         const onScroll = () => {
@@ -64,19 +68,51 @@ export default function Navbar() {
     }, []);
 
     useEffect(() => {
+        const pageContent = document.getElementById("page-content");
         if (menuOpen) {
             stop();
             document.body.style.overflow = "hidden";
+            pageContent?.setAttribute("inert", "");
+            pageContent?.setAttribute("aria-hidden", "true");
+            wasMenuOpenRef.current = true;
+            requestAnimationFrame(() => firstMenuLinkRef.current?.focus());
         } else {
             start();
             document.body.style.overflow = "";
+            pageContent?.removeAttribute("inert");
+            pageContent?.removeAttribute("aria-hidden");
+            if (wasMenuOpenRef.current) menuButtonRef.current?.focus();
+            wasMenuOpenRef.current = false;
         }
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") setMenuOpen(false);
+            if (e.key === "Escape") {
+                setMenuOpen(false);
+                return;
+            }
+            if (e.key !== "Tab" || !menuOpen) return;
+
+            const menuItems = Array.from(
+                menuRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])") ?? []
+            );
+            const focusable = [menuButtonRef.current, ...menuItems].filter(
+                (item): item is HTMLElement => item !== null
+            );
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (!first || !last) return;
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
         };
         if (menuOpen) window.addEventListener("keydown", onKey);
         return () => {
             window.removeEventListener("keydown", onKey);
+            pageContent?.removeAttribute("inert");
+            pageContent?.removeAttribute("aria-hidden");
             start();
             document.body.style.overflow = "";
         };
@@ -84,7 +120,7 @@ export default function Navbar() {
 
     const go = (href: string) => {
         setMenuOpen(false);
-        window.setTimeout(() => scrollTo(href), menuOpen ? 380 : 0);
+        window.setTimeout(() => scrollTo(href), menuOpen && !reducedMotion ? 380 : 0);
     };
 
     return (
@@ -152,20 +188,23 @@ export default function Navbar() {
                                 <Phone className="h-4 w-4" />
                             </a>
                             <Magnetic strength={0.22} className="hidden md:inline-block">
-                                <Button
-                                    variant="accent"
-                                    size="sm"
-                                    className={cn(menuOpen && "invisible")}
-                                    onClick={() => openBooking()}
-                                >
-                                    <Sparkles className="h-3.5 w-3.5" />
-                                    Book consultation
+                                <Button variant="accent" size="sm" asChild className={cn(menuOpen && "invisible")}>
+                                    <a
+                                        href={createWhatsAppUrl("Hello Elysea Aesthetic Clinic, I would like to enquire about your services.")}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <MessageCircle className="h-3.5 w-3.5" />
+                                        WhatsApp enquiry
+                                    </a>
                                 </Button>
                             </Magnetic>
                             <button
+                                ref={menuButtonRef}
                                 type="button"
                                 onClick={() => setMenuOpen((o) => !o)}
                                 aria-expanded={menuOpen}
+                                aria-controls="mobile-menu"
                                 aria-label={menuOpen ? "Close menu" : "Open menu"}
                                 className={cn(
                                     "grid h-10 w-10 place-items-center rounded-full border transition-colors lg:hidden",
@@ -182,10 +221,15 @@ export default function Navbar() {
             <AnimatePresence>
                 {menuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
+                        ref={menuRef}
+                        id="mobile-menu"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Mobile navigation"
+                        initial={reducedMotion ? false : { opacity: 0, clipPath: "inset(0 0 100% 0)" }}
                         animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
-                        exit={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
-                        transition={{ duration: 0.65, ease: EASE_OUT }}
+                        exit={reducedMotion ? { opacity: 0 } : { opacity: 0, clipPath: "inset(0 0 100% 0)" }}
+                        transition={{ duration: reducedMotion ? 0 : 0.65, ease: EASE_OUT }}
                         className="fixed inset-0 z-40 overflow-y-auto bg-plum lg:hidden"
                         data-lenis-prevent
                     >
@@ -193,23 +237,24 @@ export default function Navbar() {
                         <div className="pointer-events-none absolute -bottom-24 -left-24 h-80 w-80 animate-aurora-b rounded-full bg-gild/15 blur-3xl" />
                         <motion.nav
                             className="relative flex min-h-full flex-col px-8 pb-10 pt-28"
-                            initial="closed"
+                            initial={reducedMotion ? false : "closed"}
                             animate="open"
                             variants={{
-                                open: { transition: { staggerChildren: 0.07, delayChildren: 0.2 } },
+                                open: { transition: { staggerChildren: reducedMotion ? 0 : 0.07, delayChildren: reducedMotion ? 0 : 0.2 } },
                             }}
                             aria-label="Mobile"
                         >
                             {STORY_LINKS.map((link, i) => (
                                 <motion.a
                                     key={link.href}
+                                    ref={i === 0 ? firstMenuLinkRef : undefined}
                                     href={link.href}
                                     variants={{
-                                        closed: { opacity: 0, y: 30 },
+                                        closed: reducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 },
                                         open: {
                                             opacity: 1,
                                             y: 0,
-                                            transition: { duration: 0.7, ease: EASE_OUT },
+                                            transition: { duration: reducedMotion ? 0 : 0.7, ease: EASE_OUT },
                                         },
                                     }}
                                     onClick={(e) => {
@@ -229,11 +274,11 @@ export default function Navbar() {
                             ))}
                             <motion.div
                                 variants={{
-                                    closed: { opacity: 0, y: 30 },
+                                    closed: reducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 },
                                     open: {
                                         opacity: 1,
                                         y: 0,
-                                        transition: { duration: 0.7, ease: EASE_OUT },
+                                        transition: { duration: reducedMotion ? 0 : 0.7, ease: EASE_OUT },
                                     },
                                 }}
                                 className="mt-auto pt-10"
@@ -249,17 +294,15 @@ export default function Navbar() {
                                 >
                                     {CLINIC.phone}
                                 </a>
-                                <Button
-                                    variant="accent"
-                                    size="lg"
-                                    className="mt-6 w-full"
-                                    onClick={() => {
-                                        setMenuOpen(false);
-                                        openBooking();
-                                    }}
-                                >
-                                    <Sparkles className="h-4 w-4" />
-                                    Book a consultation
+                                <Button variant="accent" size="lg" className="mt-6 w-full" asChild>
+                                    <a
+                                        href={createWhatsAppUrl("Hello Elysea Aesthetic Clinic, I would like to enquire about your services.")}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <MessageCircle className="h-4 w-4" />
+                                        Enquire on WhatsApp
+                                    </a>
                                 </Button>
                             </motion.div>
                         </motion.nav>
@@ -271,10 +314,10 @@ export default function Navbar() {
                 {showTop && !menuOpen && (
                     <motion.button
                         type="button"
-                        initial={{ opacity: 0, y: 18, scale: 0.9 }}
+                        initial={reducedMotion ? false : { opacity: 0, y: 18, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 18, scale: 0.9 }}
-                        transition={{ ease: EASE_OUT, duration: 0.4 }}
+                        exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.9 }}
+                        transition={{ ease: EASE_OUT, duration: reducedMotion ? 0 : 0.4 }}
                         onClick={() => scrollTo("#home")}
                         aria-label="Back to top"
                         className="fixed bottom-6 right-6 z-40 grid h-12 w-12 place-items-center rounded-full border border-gild/40 bg-plum text-cream shadow-lift transition-colors hover:bg-copper"

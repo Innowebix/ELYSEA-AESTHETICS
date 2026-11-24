@@ -3,9 +3,11 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { createWhatsAppUrl } from "@/lib/clinic";
 
-const WHATSAPP_URL =
-  "https://wa.me/918141115873?text=Hello%20Elysea%20Aesthetic%20Clinic%2C%20I%20would%20like%20to%20know%20more%20about%20your%20services.";
+const WHATSAPP_URL = createWhatsAppUrl(
+  "Hello Elysea Aesthetic Clinic, I would like to know more about your services."
+);
 
 export default function Story() {
   const shouldReduceMotion = useReducedMotion();

@@ -5,46 +5,61 @@ import { useEffect, useState } from "react";
 
 import {
     ArrowUpRight,
-    CalendarDays,
     Instagram,
     Mail,
     MapPin,
     Phone,
-    ShieldCheck,
     Sparkles,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Em, Reveal, SectionHeading } from "@/components/primitives";
-import { useBooking } from "@/components/booking";
-import { CLINIC, HOURS } from "@/lib/data";
+import { CLINIC, HOURS, createWhatsAppUrl } from "@/lib/clinic";
 import { cn } from "@/lib/utils";
 
-// Exact Google Maps embed supplied for Elysea Aesthetic Clinic
-const MAP_EMBED_URL =
-    "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12397.67144335569!2d73.03165271348787!3d21.726097808591486!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be021a386abab55%3A0x8095ac2d18619a44!2sElysea%20Aesthetic%20Clinic!5e1!3m2!1sen!2sin!4v1795422876863!5m2!1sen!2sin";
-
-// Exact Google Maps directions destination
-const MAP_DIRECTIONS_URL =
-    "https://www.google.com/maps/dir/?api=1&destination=21.726097808591486%2C73.03165271348787";
-
 function ClinicMap() {
+    const [mapLoaded, setMapLoaded] = useState(false);
+
     return (
         <div className="relative h-[320px] flex-1 overflow-hidden bg-[#eee8df] sm:h-[360px]">
 
-            {/* Actual Google Maps */}
-            <iframe
-                title="Elysea Aesthetic Clinic Location"
-                src={MAP_EMBED_URL}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="strict-origin-when-cross-origin"
-                className="clinic-map-frame absolute inset-0 h-full w-full"
-            />
+            {mapLoaded ? (
+                <iframe
+                    title="Elysea Aesthetic Clinic Location on Google Maps"
+                    src={CLINIC.mapsEmbedUrl}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    className="clinic-map-frame absolute inset-0 h-full w-full"
+                />
+            ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blush via-porcelain to-sand p-6 text-center">
+                    <MapPin className="h-8 w-8 text-copper" aria-hidden="true" />
+                    <p className="mt-3 font-display text-xl text-plum">View Elysea on Google Maps</p>
+                    <p className="mt-2 max-w-sm text-xs leading-relaxed text-plum/60">
+                        Loading the embedded map connects to Google Maps.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => setMapLoaded(true)}
+                        className="mt-4 rounded-full bg-plum px-5 py-3 text-xs font-semibold text-cream transition-colors hover:bg-copper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-2"
+                    >
+                        Load Google Map
+                    </button>
+                    <a
+                        href={CLINIC.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 text-xs font-semibold text-plum underline underline-offset-4 hover:text-copper"
+                    >
+                        Open Google Maps directly
+                    </a>
+                </div>
+            )}
 
             {/* Subtle warm overlay */}
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-plum/[0.06] via-transparent to-plum/[0.10]" />
@@ -76,12 +91,15 @@ function ClinicMap() {
 }
 
 export default function Visit() {
-    const { openBooking } = useBooking();
-
-    const [today, setToday] = useState(-1);
+    const [today, setToday] = useState("");
 
     useEffect(() => {
-        setToday(new Date().getDay());
+        setToday(
+            new Intl.DateTimeFormat("en-US", {
+                weekday: "long",
+                timeZone: CLINIC.timezone,
+            }).format(new Date())
+        );
     }, []);
 
     return (
@@ -131,7 +149,7 @@ export default function Visit() {
 
                                 <Button variant="outline" size="sm" asChild>
                                     <a
-                                        href={MAP_DIRECTIONS_URL}
+                                        href={CLINIC.mapsDirectionsUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
@@ -161,7 +179,7 @@ export default function Visit() {
                                     </h3>
 
                                     <Badge variant="sage">
-                                        Walk-ins welcome
+                                        Contact for availability
                                     </Badge>
 
                                 </div>
@@ -170,7 +188,7 @@ export default function Visit() {
 
                                     {HOURS.map((row) => {
 
-                                        const isToday = today === row.jsDay;
+                                        const isToday = today === row.label;
 
                                         return (
                                             <div
@@ -228,7 +246,7 @@ export default function Visit() {
                                     </a>
 
                                     <a
-                                        href={`mailto:${CLINIC.email}`}
+                                        href={CLINIC.emailHref}
                                         className="flex items-center gap-2 font-semibold text-plum transition-colors hover:text-copper"
                                     >
                                         <Mail className="h-4 w-4 text-copper" />
@@ -253,7 +271,7 @@ export default function Visit() {
 
                         </Reveal>
 
-                        {/* Consultation CTA */}
+                        {/* WhatsApp enquiry CTA */}
                         <Reveal delay={0.2} className="flex-1">
 
                             <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-[2rem] bg-gradient-to-br from-plum to-ink p-7 sm:p-8">
@@ -266,48 +284,37 @@ export default function Visit() {
                                 <div className="relative">
 
                                     <h3 className="font-display text-2xl font-medium text-cream sm:text-3xl">
-                                        Your skin, on the{" "}
+                                        Questions about a{" "}
                                         <em className="italic text-petal">
-                                            calendar.
+                                            service?
                                         </em>
                                     </h3>
 
                                     <p className="mt-2 max-w-md text-sm leading-relaxed text-cream/65">
-                                        Consultations are complimentary and never rushed. Bring your
-                                        questions, your current routine, and your barest skin.
+                                        Contact Elysea directly to ask which services are available and plan a visit.
                                     </p>
 
                                     <Button
                                         variant="accent"
                                         size="lg"
                                         className="mt-6"
-                                        onClick={() => openBooking()}
+                                        asChild
                                     >
-                                        <Sparkles className="h-4 w-4" />
-                                        Book a consultation
+                                        <a
+                                            href={createWhatsAppUrl("Hello Elysea Aesthetic Clinic, I would like to enquire about your services and visit availability.")}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <Sparkles className="h-4 w-4" />
+                                            Enquire on WhatsApp
+                                        </a>
                                     </Button>
 
                                 </div>
 
-                                {/* Trust indicators */}
-                                <div className="relative mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold text-cream/60">
-
-                                    <span className="flex items-center gap-1.5">
-                                        <ShieldCheck className="h-4 w-4 text-gild" />
-                                        Licensed physicians
-                                    </span>
-
-                                    <span className="flex items-center gap-1.5">
-                                        <CalendarDays className="h-4 w-4 text-gild" />
-                                        Free reschedule · 24h
-                                    </span>
-
-                                    <span className="flex items-center gap-1.5">
-                                        <Sparkles className="h-4 w-4 text-gild" />
-                                        No deposit
-                                    </span>
-
-                                </div>
+                                <p className="relative mt-7 text-xs leading-relaxed text-cream/60">
+                                    Contact the clinic directly before travelling.
+                                </p>
 
                             </div>
 

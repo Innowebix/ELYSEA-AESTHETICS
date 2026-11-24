@@ -45,6 +45,8 @@ export default function Atmosphere() {
         return () => window.removeEventListener("pointermove", move);
     }, [reduced, mx, my]);
 
+    if (reduced) return null;
+
     return (
         <>
             <div

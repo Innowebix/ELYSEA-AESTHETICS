@@ -149,14 +149,19 @@ export function Counter({
 }) {
     const ref = useRef<HTMLSpanElement>(null);
     const inView = useInView(ref, { once: true, margin: "-40px" });
+    const reducedMotion = useReducedMotion();
     const mv = useMotionValue(0);
     const text = useTransform(mv, (v) => `${prefix}${v.toFixed(decimals)}${suffix}`);
 
     useEffect(() => {
         if (!inView) return;
+        if (reducedMotion) {
+            mv.set(value);
+            return;
+        }
         const controls = animate(mv, value, { duration: 2, ease: EASE_OUT });
         return () => controls.stop();
-    }, [inView, value, mv]);
+    }, [inView, reducedMotion, value, mv]);
 
     return (
         <motion.span ref={ref} className={className}>

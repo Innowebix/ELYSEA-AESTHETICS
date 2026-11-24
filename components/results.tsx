@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, MapPin } from "lucide-react";
+import { CLINIC } from "@/lib/clinic";
 
 export default function Results() {
   const reducedMotion = useReducedMotion();
@@ -165,9 +166,7 @@ export default function Results() {
                 </h3>
 
                 <p className="mt-5 max-w-md text-sm leading-[1.9] text-cream/70">
-                  FF-52, Sharnam Sky, beside Jhulelal Hospital,
-                  Zadeshwar Chowkdi, Ganesh Shrishti,
-                  Zadeshwar, Bharuch, Gujarat 392011.
+                  {CLINIC.fullAddress}
                 </p>
 
               </div>

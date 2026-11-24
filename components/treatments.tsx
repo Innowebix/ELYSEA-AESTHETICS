@@ -3,105 +3,8 @@
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowUpRight,
-  Droplets,
-  Flower2,
-  Leaf,
-  ScanFace,
-  Sparkles,
-  Zap,
 } from "lucide-react";
-
-const SERVICES = [
-  {
-    number: "01",
-    name: "Skin Concern",
-    subtitle: "Skin care",
-    icon: ScanFace,
-    services: [
-      "Acne & Acne Scar Treatment",
-      "Anti-Ageing & Wrinkle Reduction",
-      "Melasma & Pigmentation Treatment",
-      "Skin Rejuvenation",
-    ],
-  },
-  {
-    number: "02",
-    name: "Cosmetic Procedure",
-    subtitle: "Aesthetic procedures",
-    icon: Sparkles,
-    services: [
-      "Microdermabrasion",
-      "Chemical Peels",
-      "Mesotherapy",
-      "Microneedling",
-      "PRP & GFC Therapy",
-      "RF Skin Tightening",
-      "LED Light Therapy",
-    ],
-  },
-  {
-    number: "03",
-    name: "Medical Facials",
-    subtitle: "Facial treatments",
-    icon: Flower2,
-    services: [
-      "Hydra Facial",
-      "Oxy Facial",
-      "Carbon Laser Facial",
-      "Vampire (PRP) Facial",
-      "Korean Glass Skin Facial",
-    ],
-  },
-  {
-    number: "04",
-    name: "Hair",
-    subtitle: "Hair & scalp care",
-    icon: Leaf,
-    services: [
-      "Hair Fall Diagnosis",
-      "Hair Loss Treatment",
-      "Anti-dandruff Treatment",
-      "Alopecia Management",
-      "Hair Mesotherapy",
-      "Hair Microneedling",
-      "PRP And GFC Therapy",
-      "LED Light Therapy",
-    ],
-  },
-  {
-    number: "05",
-    name: "Laser",
-    subtitle: "Laser treatments",
-    icon: Zap,
-    services: [
-      "Laser Hair Reduction",
-      "Beard Shaping",
-      "Tattoo Removal",
-      "Carbon Laser Peel",
-      "Laser Skin Toning",
-    ],
-  },
-  {
-    number: "06",
-    name: "Minor Procedures",
-    subtitle: "Clinical procedures",
-    icon: Droplets,
-    services: [
-      "Ear Lobe Repair",
-      "Nail Avulsion",
-      "Wart And Skin Tag Excision",
-      "Mole Removal",
-      "Milia Extraction",
-    ],
-  },
-] as const;
-
-function getWhatsAppLink(category: string) {
-  const message =
-    `Hello Elysea Aesthetic Clinic, I would like to enquire about ${category} services.`;
-
-  return `https://wa.me/918141115873?text=${encodeURIComponent(message)}`;
-}
+import { SERVICE_CATEGORIES, createWhatsAppUrl } from "@/lib/clinic";
 
 export default function Treatments() {
   const reducedMotion = useReducedMotion();
@@ -171,7 +74,7 @@ export default function Treatments() {
         {/* Service categories */}
         <div className="mt-14 grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3 lg:gap-6 sm:mt-16">
 
-          {SERVICES.map((category, index) => {
+          {SERVICE_CATEGORIES.map((category, index) => {
             const Icon = category.icon;
 
             return (
@@ -244,7 +147,7 @@ export default function Treatments() {
                 {/* WhatsApp enquiry */}
                 <div className="relative mt-7 border-t border-sand/70 pt-5">
                   <a
-                    href={getWhatsAppLink(category.name)}
+                    href={createWhatsAppUrl(`Hello Elysea Aesthetic Clinic, I would like to enquire about ${category.name} services.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Enquire about ${category.name} services on WhatsApp`}
@@ -277,7 +180,7 @@ export default function Treatments() {
           </p>
 
           <a
-            href={getWhatsAppLink("all treatment categories")}
+            href={createWhatsAppUrl("Hello Elysea Aesthetic Clinic, I would like to enquire about your services.")}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-[50px] items-center justify-center gap-3 rounded-full bg-plum px-7 py-4 text-xs font-semibold tracking-wide text-cream transition-all duration-300 hover:-translate-y-1 hover:bg-copper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4"

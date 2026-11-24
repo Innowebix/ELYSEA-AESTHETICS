@@ -15,42 +15,59 @@ import {
   Phone,
   Star,
 } from "lucide-react";
+import { CLINIC, HOURS, SERVICE_CATEGORIES, createWhatsAppUrl } from "@/lib/clinic";
 
-const PHONE = "+918141115873";
-
-const WHATSAPP_URL =
-  "https://wa.me/918141115873?text=Hello%20Elysea%20Aesthetic%20Clinic%2C%20I%20would%20like%20to%20make%20an%20enquiry.";
+const WHATSAPP_URL = createWhatsAppUrl(
+  "Hello Elysea Aesthetic Clinic, I would like to enquire about your services."
+);
+const HOURS_SUMMARY = HOURS.map((row) => `${row.label}: ${row.time}`).join("; ");
+const HOURS_GROUPS = HOURS.reduce<Array<{ days: string[]; time: string }>>(
+  (groups, row) => {
+    const lastGroup = groups[groups.length - 1];
+    if (lastGroup?.time === row.time) {
+      lastGroup.days.push(row.label);
+    } else {
+      groups.push({ days: [row.label], time: row.time });
+    }
+    return groups;
+  },
+  []
+).map(({ days, time }) => ({
+  label: days.length === 1 ? days[0] : `${days[0]} – ${days[days.length - 1]}`,
+  time,
+}));
+const CATEGORY_SUMMARY = SERVICE_CATEGORIES.map((category) => category.name).join(", ");
 
 const FAQS = [
   {
     question: "What services are available at Elysea?",
     answer:
-      "Elysea Aesthetic Clinic offers six categories of services: Skin Concerns, Cosmetic Procedures, Medical Facials, Hair, Laser and Minor Procedures. Each category includes a range of services. Please explore our Treatments section for the complete list.",
+      `Elysea Aesthetic Clinic offers these service categories: ${CATEGORY_SUMMARY}. Please explore our Treatments section for the listed services.`,
   },
   {
     question: "Who is the doctor at Elysea?",
     answer:
-      "Dr. Vrujal Mistry is associated with Elysea Aesthetic Clinic. Her qualifications include BHMS and PGDAM. She is identified in the clinic brochure as a Consultant Aesthetic Physician, Cosmetologist and Trichologist. She has over eight years of experience in the medical field.",
+      `Dr. Vrujal Mistry is Elysea Aesthetic Clinic's Consultant Aesthetic Physician, Cosmetologist and Trichologist. Her qualifications are ${CLINIC.doctor.qualifications}, and she has ${CLINIC.doctor.experience}.`,
   },
   {
     question: "Where is Elysea Aesthetic Clinic located?",
     answer:
-      "We are located at FF-52, Sharnam Sky, beside Jhulelal Hospital, Zadeshwar Chowkdi, Ganesh Shrishti, Zadeshwar, Bharuch, Gujarat. Please use the Visit section of our website for location and directions.",
+      `Elysea Aesthetic Clinic is located at ${CLINIC.fullAddress}. Please use the Visit section for directions.`,
   },
   {
     question: "What are the clinic opening hours?",
     answer:
-      "Monday to Saturday: 10:00 AM to 7:00 PM. Sunday: 10:00 AM to 2:00 PM.",
+      HOURS_SUMMARY,
   },
   {
     question: "How can I enquire about treatments?",
     answer:
-      "You can contact Elysea Aesthetic Clinic by phone or WhatsApp at +91 81411 15873. You can enquire about any of the six service categories and discuss your requirements directly with the clinic.",
+      `Contact Elysea Aesthetic Clinic by phone or WhatsApp at ${CLINIC.phone} to ask about a service or visit availability.`,
   },
   {
     question: "Where can I find treatment prices?",
     answer:
-      "The clinic brochure lists the available service categories and treatments but does not provide prices. Please contact Elysea directly at +91 81411 15873 to enquire about current treatment pricing.",
+      `Prices are not listed on this website. Contact Elysea directly at ${CLINIC.phone} to ask about current pricing.`,
   },
 ];
 
@@ -112,7 +129,13 @@ export default function Faq() {
           </p>
 
           {/* Rating */}
-          <div className="mt-9 flex items-center gap-4 border-y border-sand/80 py-5">
+          <a
+            href={CLINIC.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-9 flex items-center gap-4 border-y border-sand/80 py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copper"
+            aria-label={`Read Elysea's ${CLINIC.rating} out of 5 Google rating and reviews`}
+          >
             <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-blush/60 text-copper">
               <Star className="h-5 w-5 fill-current" />
             </div>
@@ -120,7 +143,7 @@ export default function Faq() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-display text-2xl text-plum">
-                  4.7/5
+                  {CLINIC.rating.toFixed(1)}/5
                 </span>
 
                 <div className="flex gap-0.5 text-gild">
@@ -131,10 +154,10 @@ export default function Faq() {
               </div>
 
               <p className="mt-1 text-xs text-plum/55">
-                Google rating · 19 reviews
+                Google rating · {CLINIC.googleReviewCount} reviews
               </p>
             </div>
-          </div>
+          </a>
 
           {/* Contact card */}
           <div className="mt-7 rounded-[1.8rem] border border-sand/80 bg-porcelain p-6 sm:p-7">
@@ -148,11 +171,11 @@ export default function Faq() {
             </h3>
 
             <a
-              href={`tel:${PHONE}`}
+              href={CLINIC.phoneHref}
               className="mt-4 flex items-center gap-3 text-base font-semibold text-plum transition-colors hover:text-copper"
             >
               <Phone className="h-4 w-4 text-copper" />
-              +91 81411 15873
+              {CLINIC.phone}
             </a>
 
             <div className="mt-6 grid gap-3">
@@ -169,7 +192,7 @@ export default function Faq() {
               </a>
 
               <a
-                href={`tel:${PHONE}`}
+                href={CLINIC.phoneHref}
                 className="flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-sand px-5 py-3 text-xs font-semibold text-plum transition-colors hover:border-copper hover:text-copper"
               >
                 <Phone className="h-3.5 w-3.5" />
@@ -189,19 +212,12 @@ export default function Faq() {
               </p>
 
               <div className="mt-3 space-y-2 text-xs text-plum/65">
-                <div className="flex justify-between gap-3">
-                  <span>Monday – Saturday</span>
-                  <span className="font-semibold text-plum">
-                    10 AM – 7 PM
-                  </span>
-                </div>
-
-                <div className="flex justify-between gap-3">
-                  <span>Sunday</span>
-                  <span className="font-semibold text-plum">
-                    10 AM – 2 PM
-                  </span>
-                </div>
+                {HOURS_GROUPS.map((group) => (
+                  <div key={group.label} className="flex justify-between gap-3">
+                    <span>{group.label}</span>
+                    <span className="font-semibold text-plum">{group.time}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
